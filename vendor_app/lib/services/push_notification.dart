@@ -82,7 +82,7 @@ class PushNotification {
 
   //=============== update user fcm token into firebase ================
   Future updateUserFCMToken(String userId, String fcmToken) async {
-    _firestore.collection('Drivers').doc(userId).update({
+    _firestore.collection('Vendors').doc(userId).update({
       'fcmToken': fcmToken,
     }).then((_) {
       log('FCM token updated in drivers collection');

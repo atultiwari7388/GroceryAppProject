@@ -4,11 +4,12 @@ import '../constants/constants.dart';
 import '../utils/app_style.dart';
 
 class CustomGradientButton extends StatelessWidget {
-  const CustomGradientButton(
-      {super.key,
-      required this.text,
-      required this.onPress,
-      required double h});
+  const CustomGradientButton({
+    super.key,
+    required this.text,
+    required this.onPress,
+    required double h,
+  });
 
   final String text;
   final void Function()? onPress;

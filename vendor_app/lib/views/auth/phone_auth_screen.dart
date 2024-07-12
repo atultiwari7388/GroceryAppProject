@@ -34,7 +34,7 @@ class PhoneAuthenticationScreen extends StatelessWidget {
                             topLeft: Radius.circular(20),
                             topRight: Radius.circular(20)),
                         image: DecorationImage(
-                          image: AssetImage("assets/login_bg_2.jpg"),
+                          image: AssetImage("assets/logo_rm.png"),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -48,7 +48,7 @@ class PhoneAuthenticationScreen extends StatelessWidget {
                       children: [
                         // Heading
                         SizedBox(height: 7.h),
-                        Text("Welcome to FOODOTG\n Driver",
+                        Text("Welcome to GroceryApp\n Vendor",
                             textAlign: TextAlign.center,
                             style: appStyle(19, kDark, FontWeight.bold)),
                         // Login or Signup Text

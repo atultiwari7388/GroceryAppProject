@@ -9,7 +9,7 @@ class AdminReviewScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Review In Progress',
-            style: appStyle(18, kDark, FontWeight.normal)),
+            style: appStyle(18, kWhite, FontWeight.normal)),
         elevation: 1,
         backgroundColor: kPrimary,
       ),

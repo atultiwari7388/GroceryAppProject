@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:vendor_app/views/home/home_screen.dart';
+import 'package:vendor_app/views/items/items_screen.dart';
 import '../../constants/constants.dart';
 import '../../utils/app_style.dart';
 import '../orders/orders_screen.dart';
@@ -43,7 +44,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     List<Widget> screens = [
       HomeScreen(setTab: setTab),
       OrdersScreen(setTab: setTab),
-      const ProfileScreen()
+      const ItemsScreen()
     ];
 
     return Scaffold(
@@ -61,7 +62,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               icon: Icon(AntDesign.home), label: "Dashboard"),
           BottomNavigationBarItem(
               icon: Icon(AntDesign.shoppingcart), label: "Orders"),
-          BottomNavigationBarItem(icon: Icon(AntDesign.user), label: "Profile"),
+          BottomNavigationBarItem(icon: Icon(AntDesign.book), label: "Items"),
         ],
         currentIndex: tab,
         selectedItemColor: kSecondary,

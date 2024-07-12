@@ -1,11 +1,11 @@
 import 'dart:developer';
 import 'dart:io';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:vendor_app/services/collection_reference.dart';
 import '../../common/custom_gradient_button.dart';
 import '../../common/reusable_text.dart';
 import '../../constants/constants.dart';
@@ -333,7 +333,6 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                       text: "Add Item",
                       onPress: _addItemsToFirebase,
                       h: 45,
-                      w: 250,
                     )
                   ],
                 ),
@@ -588,7 +587,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
         "ratingCount": 1,
         'created_at': DateTime.now(),
         "priority": 0,
-        "venId": FirebaseAuth.instance.currentUser!.uid.toString(),
+        "venId": currentUId.toString(),
         "isVeg": isVeg,
         "isLowestPrice": isLowestPrice,
         "sizes": _selectedSizes.map((sizeId) {
@@ -622,13 +621,13 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
   }
 }
 
-class Size {
+class SizeS {
   String title;
   String imageUrl; // Image URL for the size
   String inches;
   num price;
 
-  Size({
+  SizeS({
     required this.title,
     required this.imageUrl,
     required this.inches,
