@@ -141,6 +141,7 @@ class LowestPriceListWidget extends StatelessWidget {
                     ),
                   ),
                 ),
+
                 Positioned(
                   top: 0.h,
                   right: 1.w,

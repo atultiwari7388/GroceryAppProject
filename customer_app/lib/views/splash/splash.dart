@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
-import 'package:customer_app/views/auth/phone_authentication_screen.dart';
-import 'package:customer_app/views/dashboard/dashboard_screen.dart';
 import 'package:customer_app/views/entry/entry.dart';
+import 'package:customer_app/views/onBoard/on_boarding_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -29,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
             duration: const Duration(milliseconds: 900));
         log("User is authenticated");
       } else {
-        Get.offAll(() => const PhoneAuthenticationScreen(),
+        Get.offAll(() => const OnBoardingScreen(),
             transition: Transition.cupertino,
             duration: const Duration(milliseconds: 900));
         log("User is null");

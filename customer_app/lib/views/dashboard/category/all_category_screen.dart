@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:customer_app/views/dashboard/subCategory/all_sub_category_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import '../../../constants/constants.dart';
 import '../../../utils/app_style.dart';
 
@@ -145,7 +147,7 @@ class _AllCategoriesScreenState extends State<AllCategoriesScreen> {
                   )
                 : StreamBuilder(
                     stream: FirebaseFirestore.instance
-                        .collection("Items")
+                        .collection("SubCategories")
                         .where("categoryId", isEqualTo: selectedCategoryId)
                         .snapshots(),
                     builder: (context, snapshot) {
@@ -173,50 +175,63 @@ class _AllCategoriesScreenState extends State<AllCategoriesScreen> {
                           itemBuilder: (context, index) {
                             final itemData = items[index].data();
 
-                            return Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20.0.r),
-                                color: kTertiary.withOpacity(0.1),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: kLightWhite,
-                                    spreadRadius: 1,
-                                    blurRadius: 2,
-                                    offset: Offset(0, 1),
+                            return GestureDetector(
+                              onTap: () {
+                                Get.to(
+                                  () => AllSubCategoriesScreen(
+                                    subCategoryId: itemData["docId"],
                                   ),
-                                ],
-                              ),
-                              margin: EdgeInsets.all(8.h),
-                              padding: EdgeInsets.all(5.h),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Image Section
-                                  Container(
-                                    height: 100.h,
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.circular(20.0.r),
-                                      color: kGrayLight,
-                                      image: itemData["image"] != null
-                                          ? DecorationImage(
-                                              image: NetworkImage(
-                                                  itemData["image"]),
-                                              fit: BoxFit.cover,
-                                            )
-                                          : null,
+                                  transition: Transition.fadeIn,
+                                  duration: const Duration(milliseconds: 900),
+                                );
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20.0.r),
+                                  color: kTertiary.withOpacity(0.1),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: kLightWhite,
+                                      spreadRadius: 1,
+                                      blurRadius: 2,
+                                      offset: Offset(0, 1),
                                     ),
-                                  ),
-                                  SizedBox(height: 8.h),
-                                  // Title Section
-                                  Text(
-                                    itemData["title"].toString(),
-                                    textAlign: TextAlign.center,
-                                    style:
-                                        appStyle(12, kDark, FontWeight.normal),
-                                  ),
-                                ],
+                                  ],
+                                ),
+                                margin: EdgeInsets.all(8.h),
+                                padding: EdgeInsets.all(5.h),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Image Section
+                                    Container(
+                                      height: 100.h,
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(20.0.r),
+                                        color: kGrayLight,
+                                        image: itemData["imageUrl"] != null
+                                            ? DecorationImage(
+                                                image: NetworkImage(
+                                                    itemData["imageUrl"]),
+                                                fit: BoxFit.cover,
+                                              )
+                                            : null,
+                                      ),
+                                    ),
+                                    SizedBox(height: 7.h),
+                                    // Title Section
+                                    Text(
+                                      itemData["subCatName"].toString(),
+                                      textAlign: TextAlign.center,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: appStyle(
+                                          12, kDark, FontWeight.normal),
+                                    ),
+                                  ],
+                                ),
                               ),
                             );
                           },

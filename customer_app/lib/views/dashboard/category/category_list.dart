@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:customer_app/views/dashboard/category/all_category_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -78,10 +79,11 @@ class CategoryListWidget extends StatelessWidget {
         categoryController.updateCategoryTitle = category["categoryName"];
         // Navigate to next screen
         Get.to(
-          () => CategoryPage(
-            categoryName: category["categoryName"],
-            catId: category["docId"],
-          ),
+          () => const AllCategoriesScreen(),
+          // () => CategoryPage(
+          //   categoryName: category["categoryName"],
+          //   catId: category["docId"],
+          // ),
           transition: Transition.fadeIn,
           duration: const Duration(milliseconds: 900),
         );

@@ -1,5 +1,5 @@
 name: customer_app
-description: "A new Flutter project."
+description: 'A new Flutter project.'
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -26,6 +26,8 @@ dependencies:
   firebase_storage: ^11.5.3
   firebase_messaging: ^14.6.8
   flutter_local_notifications: ^15.1.1
+  dots_indicator:
+  smooth_page_indicator:
   geocoding: ^3.0.0
   geolocator:
   location: ^5.0.3
@@ -54,7 +56,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -71,7 +72,6 @@ flutter:
     - assets/foodly/
     - assets/icons/
     - assets/images/
-
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

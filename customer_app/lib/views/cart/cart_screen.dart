@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../common/custom_gradient_button.dart';
 import '../../common/reusable_text.dart';
 import '../../constants/constants.dart';
+import '../../functions/inc_dec.dart';
 import '../../services/collection_ref.dart';
 import '../../utils/app_style.dart';
 
@@ -123,10 +124,10 @@ class _CartScreenState extends State<CartScreen> {
                             setState(() {
                               if (food["quantity"] > 1) {
                                 int newQuantity = food["quantity"] - 1;
-                                // updateQuantity(
-                                //     foodId, newQuantity, food["foodPrice"]);
+                                updateQuantity(
+                                    foodId, newQuantity, food["foodPrice"]);
                               } else {
-                                // showDeleteConfirmationDialog(context, food);
+                                showDeleteConfirmationDialog(context, food);
                               }
                             });
                           },
@@ -139,8 +140,8 @@ class _CartScreenState extends State<CartScreen> {
                             setState(() {
                               int newQuantity = food["quantity"] + 1;
                               // updateQuantity(foodId, newQuantity);
-                              // updateQuantity(
-                              //     foodId, newQuantity, food["foodPrice"]);
+                              updateQuantity(
+                                  foodId, newQuantity, food["foodPrice"]);
                             });
                           },
                         ),
@@ -183,48 +184,6 @@ class _CartScreenState extends State<CartScreen> {
           ),
           //veg and nonveg section
           SizedBox(height: 5.h),
-          Container(
-            width: 70,
-            padding: EdgeInsets.fromLTRB(5.w, 1.h, 5.w, 0.h),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: food["isVeg"] ? Colors.green : kRed,
-              ),
-              borderRadius: BorderRadius.circular(10.r),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  height: 23.h,
-                  width: 25.w,
-                  decoration: BoxDecoration(
-                    // color: widget.food["isVeg"] ? Colors.green : kRed,
-                    image: DecorationImage(
-                      image: AssetImage(
-                        food["isVeg"]
-                            ? "assets/vegetarian.png"
-                            : "assets/non-veg.png",
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 4.w),
-                Container(
-                  // padding: EdgeInsets.fromLTRB(5.w, 1.h, 5.w, 1.h),
-                  decoration: const BoxDecoration(),
-                  child: Center(
-                    child: ReusableText(
-                      text: food["isVeg"] ? "Veg" : "Non-veg",
-                      style: appStyle(
-                          6,
-                          food["isVeg"] ? Colors.green : Colors.red,
-                          FontWeight.bold),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
