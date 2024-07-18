@@ -3,11 +3,13 @@ import 'package:customer_app/views/dashboard/foodTile/food_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import '../../../constants/constants.dart';
 import '../../../functions/get_cart_item_count_string.dart';
 import '../../../services/collection_ref.dart';
 import '../../../utils/app_style.dart';
+import '../../checkout/checkout_screen.dart';
 import '../searchScreen/search_screen.dart';
 
 class AllSubCategoriesScreen extends StatefulWidget {
@@ -77,7 +79,7 @@ class _AllSubCategoriesScreenState extends State<AllSubCategoriesScreen> {
               if (itemCount > 0) {
                 return GestureDetector(
                   onTap: () {
-                    // Get.to(() => CheckoutScreen());
+                    Get.to(() => const CheckoutScreen());
                   },
                   child: Badge(
                     backgroundColor: kPrimary,

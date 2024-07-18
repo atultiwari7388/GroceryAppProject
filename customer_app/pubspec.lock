@@ -161,6 +161,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.10"
+  device_info_plus:
+    dependency: transitive
+    description:
+      name: device_info_plus
+      sha256: "77f757b789ff68e4eaf9c56d1752309bd9f7ad557cb105b938a7f8eb89e59110"
+      url: "https://pub.dev"
+    source: hosted
+    version: "9.1.2"
+  device_info_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: device_info_plus_platform_interface
+      sha256: d3b01d5868b50ae571cd1dc6e502fc94d956b665756180f7b16ead09e836fd64
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.0.0"
   dots_indicator:
     dependency: "direct main"
     description:
@@ -721,7 +737,7 @@ packages:
     source: hosted
     version: "4.2.0"
   logger:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: logger
       sha256: "7ad7215c15420a102ec687bb320a7312afd449bac63bfb1c60d9787c27b9767f"
@@ -889,7 +905,7 @@ packages:
     source: hosted
     version: "2.1.1"
   rxdart:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: rxdart
       sha256: "0c7c0cedd93788d996e33041ffecda924cc54389199cde4e6a34b440f50044cb"
@@ -1165,6 +1181,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.4"
+  vibration:
+    dependency: "direct main"
+    description:
+      name: vibration
+      sha256: "06588a845a4ebc73ab7ff7da555c2b3dbcd9676164b5856a38bf0b2287f1045d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.9.0"
+  vibration_platform_interface:
+    dependency: transitive
+    description:
+      name: vibration_platform_interface
+      sha256: "735a5fef0f284de0ad9449a5ed7d36ba017c6f59b5b20ac64418af4a6bd35ee7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.1"
   web:
     dependency: transitive
     description:
@@ -1181,6 +1213,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.2.0"
+  win32_registry:
+    dependency: transitive
+    description:
+      name: win32_registry
+      sha256: "41fd8a189940d8696b1b810efb9abcf60827b6cbfab90b0c43e8439e3a39d85a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.2"
   xdg_directories:
     dependency: transitive
     description:

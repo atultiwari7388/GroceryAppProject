@@ -44,6 +44,9 @@ dependencies:
   http:
   url_launcher: ^6.2.6
   image_picker:
+  rxdart:
+  vibration:
+  logger:
 
 dev_dependencies:
   flutter_test:

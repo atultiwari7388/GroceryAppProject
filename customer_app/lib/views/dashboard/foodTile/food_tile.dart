@@ -535,6 +535,7 @@ class _FoodTileWidgetState extends State<FoodTileWidget> {
                                     "foodId": widget.food["docId"],
                                     "quantity": quantity,
                                     "img": widget.food["image"],
+                                    "time": widget.food["time"].toString(),
                                     "totalPrice": finalPrice,
                                     "subTotalPrice": finalPrice,
                                     "baseTotalPrice": finalPrice,

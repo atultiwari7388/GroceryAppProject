@@ -1,12 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import '../../common/custom_gradient_button.dart';
 import '../../common/reusable_text.dart';
 import '../../constants/constants.dart';
 import '../../functions/inc_dec.dart';
 import '../../services/collection_ref.dart';
 import '../../utils/app_style.dart';
+import '../checkout/checkout_screen.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({Key? key});
@@ -66,7 +68,7 @@ class _CartScreenState extends State<CartScreen> {
                 CustomGradientButton(
                   text: "Proceed to checkout",
                   onPress: () {
-                    // Get.to(() => CheckoutScreen());
+                    Get.to(() => const CheckoutScreen());
                   },
                 ),
               ],
