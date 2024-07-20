@@ -5,6 +5,7 @@ import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import '../../../common/custom_circle_icon_button.dart';
 import '../../../common/dashed_divider.dart';
 import '../../../common/reusable_text.dart';
@@ -12,6 +13,7 @@ import '../../../constants/constants.dart';
 import '../../../functions/add_to_cart.dart';
 import '../../../services/collection_ref.dart';
 import '../../../utils/app_style.dart';
+import '../../checkout/checkout_screen.dart';
 
 class FoodTileWidget extends StatefulWidget {
   const FoodTileWidget({Key? key, required this.food});
@@ -564,7 +566,7 @@ class _FoodTileWidgetState extends State<FoodTileWidget> {
                                       action: SnackBarAction(
                                         label: 'View',
                                         onPressed: () {
-                                          // Get.to(() => CheckoutScreen());
+                                          Get.to(() => const CheckoutScreen());
                                         },
                                       ),
                                     ),

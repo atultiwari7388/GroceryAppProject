@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer_app/common/reusable_text.dart';
 import 'package:customer_app/controllers/lowest_price_controller.dart';
 import 'package:customer_app/utils/app_style.dart';
+import 'package:customer_app/views/dashboard/foodTile/food_tile.dart';
+import 'package:customer_app/views/dashboard/subCategory/all_sub_category_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -113,18 +115,6 @@ class LowestPriceListWidget extends StatelessWidget {
           children: [
             Stack(
               children: [
-                // Container(
-                //   padding: EdgeInsets.all(5.h),
-                //   decoration: BoxDecoration(
-                //       border: Border.all(color: kGrayLight),
-                //       borderRadius: BorderRadius.circular(12.r)),
-                //   height: 110.h,
-                //   width: 160.w,
-                //   child: Image.network(
-                //     lowestPrice["image"],
-                //     fit: BoxFit.cover,
-                //   ),
-                // ),
                 Container(
                   padding: EdgeInsets.all(5.h),
                   decoration: BoxDecoration(
@@ -141,7 +131,6 @@ class LowestPriceListWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-
                 Positioned(
                   top: 0.h,
                   right: 1.w,
@@ -225,16 +214,21 @@ class LowestPriceListWidget extends StatelessWidget {
                         ],
                       ),
                       //Outline add Button
-                      Container(
-                        height: 29.h,
-                        width: 60.w,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10.r),
-                          border: Border.all(color: kPrimary),
-                        ),
-                        child: Center(
-                          child: Text("ADD",
-                              style: appStyle(14, kPrimary, FontWeight.normal)),
+                      GestureDetector(
+                        onTap: () => Get.to(() => AllSubCategoriesScreen(
+                            subCategoryId: lowestPrice["subCategoryId"])),
+                        child: Container(
+                          height: 29.h,
+                          width: 60.w,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.r),
+                            border: Border.all(color: kPrimary),
+                          ),
+                          child: Center(
+                            child: Text("ADD",
+                                style:
+                                    appStyle(14, kPrimary, FontWeight.normal)),
+                          ),
                         ),
                       ),
                     ],

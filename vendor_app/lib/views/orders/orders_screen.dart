@@ -20,7 +20,7 @@ class _OrdersScreenState extends State<OrdersScreen>
     with SingleTickerProviderStateMixin {
   late TextEditingController searchController;
   late Stream<QuerySnapshot> ordersStream;
-  bool isDriverActive = false;
+  bool isVendorActive = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late TabController _tabsController;
 
@@ -41,10 +41,10 @@ class _OrdersScreenState extends State<OrdersScreen>
         .listen((event) {
       if (event.exists) {
         setState(() {
-          isDriverActive = event.data()?["active"] ?? false;
+          isVendorActive = event.data()?["active"] ?? false;
         });
 
-        if (isDriverActive) {
+        if (isVendorActive) {
           ordersStream =
               FirebaseFirestore.instance.collection('orders').snapshots();
         }
@@ -63,10 +63,10 @@ class _OrdersScreenState extends State<OrdersScreen>
           backgroundColor: kLightWhite,
           title: ReusableText(
             text: "Orders",
-            style: appStyle(20, kSecondary, FontWeight.bold),
+            style: appStyle(20, kPrimary, FontWeight.bold),
           ),
         ),
-        body: isDriverActive
+        body: isVendorActive
             ? buildOrderStreamSection()
             : buildInactiveDriverScreen(),
       ),
@@ -113,9 +113,9 @@ class _OrdersScreenState extends State<OrdersScreen>
             .toList();
 
         // Filter orders based on status
-        newOrders = orders.where((order) => order['status'] == 1).toList();
+        newOrders = orders.where((order) => order['status'] == 0).toList();
         ongoingOrders = orders
-            .where((order) => order['status'] >= 2 && order['status'] <= 4)
+            .where((order) => order['status'] >= 1 && order['status'] <= 4)
             .toList();
         completedOrders =
             orders.where((order) => order['status'] == 5).toList();
@@ -134,7 +134,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                 labelStyle: appStyle(16, kDark, FontWeight.normal),
                 indicator: UnderlineTabIndicator(
                   borderSide: BorderSide(
-                      width: 2.w, color: kSecondary), // Set your color here
+                      width: 2.w, color: kPrimary), // Set your color here
                   insets: EdgeInsets.symmetric(horizontal: 20.w),
                 ),
                 tabs: const [
@@ -222,36 +222,37 @@ class _OrdersScreenState extends State<OrdersScreen>
               final userId = order["userId"];
               final status = order["status"];
               final paymentMode = order["payMode"];
-              final GeoPoint geoPoint = order["restLocation"];
+              // final GeoPoint geoPoint = order["restLocation"];
               final double userLat = order["userLat"];
               final double userLong = order["userLong"];
               final orderItems = order["orderItems"];
               final orderDate = DateTime.fromMillisecondsSinceEpoch(
                   order['orderDate'].millisecondsSinceEpoch);
+              return HistoryScreenItems(
+                orderId: orderId,
+                location: location,
+                totalPrice: totalPrice,
+                orderItems: orderItems,
+                userId: userId,
+                status: status,
+                restaurantLocation: "address",
+                paymentMode: paymentMode,
+                userLat: userLat,
+                userLong: userLong,
+                switchTab: (index) => switchTab(index),
+                orderDate: orderDate,
+              );
 
-              return FutureBuilder(
-                  future: _getAddressFromLatLng(
-                      geoPoint.latitude, geoPoint.longitude),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    final address = snapshot.data ?? "Address not found";
-                    return HistoryScreenItems(
-                      orderId: orderId,
-                      location: location,
-                      totalPrice: totalPrice,
-                      orderItems: orderItems,
-                      userId: userId,
-                      status: status,
-                      restaurantLocation: address,
-                      paymentMode: paymentMode,
-                      userLat: userLat,
-                      userLong: userLong,
-                      switchTab: (index) => switchTab(index),
-                      orderDate: orderDate,
-                    );
-                  });
+              // return FutureBuilder(
+              //     future: _getAddressFromLatLng(
+              //         geoPoint.latitude, geoPoint.longitude),
+              //     builder: (context, snapshot) {
+              //       if (snapshot.connectionState == ConnectionState.waiting) {
+              //         return const Center(child: CircularProgressIndicator());
+              //       }
+              //       final address = snapshot.data ?? "Address not found";
+
+              //     });
             },
           ),
           SizedBox(height: 100.h),
