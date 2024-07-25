@@ -217,11 +217,11 @@ class _OrdersScreenState extends State<OrdersScreen>
             itemBuilder: (ctx, index) {
               final order = filteredOrders[index];
               final orderId = order["orderId"];
-              final location = order["userDeliveryAddress"];
+              final locationAddress = order["userDeliveryAddress"];
               final totalPrice = order["totalBill"];
               final userId = order["userId"];
               final status = order["status"];
-              final paymentMode = order["payMode"];
+              // final paymentMode = order["payMode"];
               // final GeoPoint geoPoint = order["restLocation"];
               final double userLat = order["userLat"];
               final double userLong = order["userLong"];
@@ -230,15 +230,13 @@ class _OrdersScreenState extends State<OrdersScreen>
                   order['orderDate'].millisecondsSinceEpoch);
               return HistoryScreenItems(
                 orderId: orderId,
-                location: location,
+                location: locationAddress,
                 totalPrice: totalPrice,
-                orderItems: orderItems,
                 userId: userId,
                 status: status,
-                restaurantLocation: "address",
-                paymentMode: paymentMode,
                 userLat: userLat,
                 userLong: userLong,
+                orderItems: orderItems,
                 switchTab: (index) => switchTab(index),
                 orderDate: orderDate,
               );

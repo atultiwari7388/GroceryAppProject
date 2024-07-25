@@ -226,7 +226,9 @@ class _OrdersScreenState extends State<OrdersScreen>
               final userId = order["userId"];
               final status = order["status"];
               final paymentMode = order["payMode"];
-              final GeoPoint geoPoint = order["restLocation"];
+              final venLat = order["venLat"];
+              final venLong = order["venLong"];
+              // final GeoPoint geoPoint = order["restLocation"];
               final double userLat = order["userLat"];
               final double userLong = order["userLong"];
               final orderItems = order["orderItems"];
@@ -234,8 +236,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                   order['orderDate'].millisecondsSinceEpoch);
 
               return FutureBuilder(
-                  future: _getAddressFromLatLng(
-                      geoPoint.latitude, geoPoint.longitude),
+                  future: _getAddressFromLatLng(venLat, venLong),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(child: CircularProgressIndicator());
@@ -288,7 +289,7 @@ class _OrdersScreenState extends State<OrdersScreen>
           },
           decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: "Search by #FOTG00001",
+              hintText: "Search by #GOCAPP00001",
               prefixIcon: Icon(Icons.search),
               prefixStyle: appStyle(14, kDark, FontWeight.w200)),
         ),

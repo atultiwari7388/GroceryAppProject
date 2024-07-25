@@ -1,14 +1,18 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer_app/common/reusable_text.dart';
 import 'package:customer_app/controllers/lowest_price_controller.dart';
 import 'package:customer_app/utils/app_style.dart';
-import 'package:customer_app/views/dashboard/foodTile/food_tile.dart';
 import 'package:customer_app/views/dashboard/subCategory/all_sub_category_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import '../../../constants/constants.dart';
+import '../../../functions/add_to_cart.dart';
+import '../../../services/collection_ref.dart';
+import '../../checkout/checkout_screen.dart';
 
 class LowestPriceList extends StatefulWidget {
   const LowestPriceList({super.key});
@@ -66,7 +70,7 @@ class _LowestPriceListState extends State<LowestPriceList> {
   }
 }
 
-class LowestPriceListWidget extends StatelessWidget {
+class LowestPriceListWidget extends StatefulWidget {
   const LowestPriceListWidget({
     super.key,
     required this.lowestPriceController,
@@ -78,6 +82,37 @@ class LowestPriceListWidget extends StatelessWidget {
   final dynamic lowestPrice;
   final int index;
 
+  @override
+  State<LowestPriceListWidget> createState() => _LowestPriceListWidgetState();
+}
+
+class _LowestPriceListWidgetState extends State<LowestPriceListWidget> {
+  int _selectedSizeIndex = -1;
+  Set<String> _selectedAddOns = {};
+  Set<String> _selectedAllergicOns = {};
+
+  int get selectedSizeIndex => _selectedSizeIndex;
+
+  Set<String> get selectedAddOns => _selectedAddOns;
+
+  Set<String> get selectedAllergicOns => _selectedAllergicOns;
+  String? selectedSizeName;
+  double? selectedSizePrice;
+
+  // num? selectedAddOnPrice;
+
+  Map<String, num> selectedAddOnPrices = {};
+  double totalPrice = 0.0;
+  double? addOnPrice;
+  double finalPrice = 0.0;
+
+  set selectedSizeIndex(int index) {
+    _selectedSizeIndex = index;
+    setState(() {});
+  }
+
+  List<dynamic> cartItems = [];
+
   double calculateDiscountPercentage(double oldPrice, double newPrice) {
     if (oldPrice == 0) return 0.0;
     return ((oldPrice - newPrice) / oldPrice) * 100;
@@ -85,14 +120,40 @@ class LowestPriceListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    num oldPrice = lowestPrice["oldPrice"];
-    num price = lowestPrice["price"];
+    int quantity = 1; // Initial quantity
+    num oldPrice = widget.lowestPrice["oldPrice"];
+    num price = widget.lowestPrice["price"];
+    totalPrice = double.parse(widget.lowestPrice["price"].toStringAsFixed(1));
     double discountPercentage =
         calculateDiscountPercentage(oldPrice.toDouble(), price.toDouble());
+
+    double calculateTotalPrice(
+        int quantity, Map<String, num> selectedAddOnPrices) {
+      double basePrice =
+          double.parse(widget.lowestPrice["price"].toStringAsFixed(1));
+      double sizePrice = selectedSizePrice ?? 0.0;
+      double addOnsTotalPrice =
+          selectedAddOnPrices.values.fold(0.0, (sum, price) => sum + price);
+
+      // Calculate the total price
+      double totalPrice = (basePrice + sizePrice + addOnsTotalPrice) * quantity;
+      finalPrice = totalPrice;
+
+      log("Base price: $basePrice");
+      log("Selected size price: $sizePrice");
+      log("Selected addons total price: $addOnsTotalPrice");
+      log("Quantity: $quantity");
+      log("Total price: $totalPrice");
+      log("Final Price: $finalPrice");
+      return totalPrice;
+    }
+
     return GestureDetector(
       onTap: () {
-        lowestPriceController.updateLowestItem = lowestPrice["docId"];
-        lowestPriceController.updateLowestTitle = lowestPrice["title"];
+        widget.lowestPriceController.updateLowestItem =
+            widget.lowestPrice["docId"];
+        widget.lowestPriceController.updateLowestTitle =
+            widget.lowestPrice["title"];
         // Navigate to next screen
         // Get.to(
         //   () => CategoryPage(
@@ -126,7 +187,7 @@ class LowestPriceListWidget extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12.r),
                     child: Image.network(
-                      lowestPrice["image"],
+                      widget.lowestPrice["image"],
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -182,7 +243,7 @@ class LowestPriceListWidget extends StatelessWidget {
                   SizedBox(
                     width: 80.w,
                     child: Text(
-                      lowestPrice["title"],
+                      widget.lowestPrice["title"],
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.actor(
@@ -193,7 +254,7 @@ class LowestPriceListWidget extends StatelessWidget {
                   ),
                   SizedBox(height: 5.h),
                   ReusableText(
-                      text: "${lowestPrice["productQuantity"]}",
+                      text: "${widget.lowestPrice["productQuantity"]}",
                       style: appStyle(10, kDark, FontWeight.normal)),
                   SizedBox(height: 5.h),
                   Row(
@@ -215,8 +276,58 @@ class LowestPriceListWidget extends StatelessWidget {
                       ),
                       //Outline add Button
                       GestureDetector(
-                        onTap: () => Get.to(() => AllSubCategoriesScreen(
-                            subCategoryId: lowestPrice["subCategoryId"])),
+                        onTap: () {
+                          calculateTotalPrice(quantity, selectedAddOnPrices);
+                          cartItems.add(
+                            addToCart(
+                              {
+                                "foodName": widget.lowestPrice["title"],
+                                "discountAmount": 0,
+                                "couponCode": "",
+                                "foodId": widget.lowestPrice["docId"],
+                                "quantity": quantity,
+                                "img": widget.lowestPrice["image"],
+                                "time": widget.lowestPrice["time"].toString(),
+                                "totalPrice": finalPrice,
+                                "subTotalPrice": finalPrice,
+                                "baseTotalPrice": finalPrice,
+                                "quantityPrice": finalPrice,
+                                "foodPrice": widget.lowestPrice["price"],
+                                "venId": widget.lowestPrice["venId"],
+                                "foodCalories":
+                                    widget.lowestPrice["foodCalories"],
+                                "isVeg": widget.lowestPrice["isVeg"],
+                                "userId": currentUId,
+                                "selectedSize": selectedSizeName,
+                                "selectedSizePrice": selectedSizePrice ?? 0,
+                                "selectedAddOns": selectedAddOns,
+                                "selectedAddOnsPrice": selectedAddOnPrices,
+                                "selectedAllergicIngredients":
+                                    _selectedAllergicOns,
+                                "added_by": DateTime.now(),
+                              },
+                              widget.lowestPrice["docId"],
+                            ).then((value) {
+                              // Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: const Text(
+                                      "Item added to cart... view your item"),
+                                  duration: const Duration(seconds: 4),
+                                  action: SnackBarAction(
+                                    label: 'View',
+                                    onPressed: () {
+                                      Get.to(() => const CheckoutScreen());
+                                    },
+                                  ),
+                                ),
+                              );
+                            }),
+                          );
+                        },
+                        // onTap: () => Get.to(() => AllSubCategoriesScreen(
+                        //     subCategoryId:
+                        //         widget.lowestPrice["subCategoryId"])),
                         child: Container(
                           height: 29.h,
                           width: 60.w,

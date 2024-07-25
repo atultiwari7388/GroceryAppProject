@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:driver_app/views/payoutMode/payout_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:driver_app/views/auth/phone_authentication_screen.dart';
@@ -91,6 +92,13 @@ class ProfileScreen extends StatelessWidget {
                           "assets/star.png",
                           "Your Ratings",
                           () => Get.to(() => AllRatingsScreen(),
+                              transition: Transition.cupertino,
+                              duration: const Duration(milliseconds: 900)),
+                        ),
+                        buildListTile(
+                          "assets/money.png",
+                          "Payout",
+                          () => Get.to(() => PayoutModeScreen(),
                               transition: Transition.cupertino,
                               duration: const Duration(milliseconds: 900)),
                         ),

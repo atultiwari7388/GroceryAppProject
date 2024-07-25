@@ -37,9 +37,13 @@ class DatabaseServices {
       "approved": false,
       "active": false,
       "totalEarning": 0,
+      "todaysOrder": 0,
       "todaysEarning": 0,
+      "thisMonthOrder": 0,
+      "withdrawlAmount": 0,
       "orderCompleted": 0,
       "totalOrders": 0,
+      "cType": "",
       "created_at": DateTime.now(),
       "updated_at": DateTime.now(),
     });

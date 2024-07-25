@@ -38,6 +38,10 @@ class DatabaseServices {
       "todaysEarning": 0,
       "orderCompleted": 0,
       "totalOrders": 0,
+      "thisMonthOrder": 0,
+      "withdrawAmount": 0,
+      "vType": "Comission",
+      "vTypeValue": 10,
       "created_at": DateTime.now(),
       "updated_at": DateTime.now(),
     });

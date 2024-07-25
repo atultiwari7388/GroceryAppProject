@@ -81,7 +81,7 @@ class _FoodTileWidgetState extends State<FoodTileWidget> {
       children: [
         GestureDetector(
           onTap: () {
-            buildShowModalBottomSheet(context);
+            // buildShowModalBottomSheet(context);
           },
           child: Container(
             margin:
@@ -191,8 +191,8 @@ class _FoodTileWidgetState extends State<FoodTileWidget> {
         ),
         //Available price
         Positioned(
-          right: 5.w,
-          bottom: 20.h,
+          right: 62.w,
+          bottom: 10.h,
           child: SizedBox(
             width: 50.w,
             height: 19.h,
@@ -206,8 +206,8 @@ class _FoodTileWidgetState extends State<FoodTileWidget> {
         ),
 
         Positioned(
-          right: 35.w,
-          bottom: 18.h,
+          right: 95.w,
+          bottom: 10.h,
           child: SizedBox(
             width: 50.w,
             height: 19.h,
@@ -221,28 +221,28 @@ class _FoodTileWidgetState extends State<FoodTileWidget> {
           ),
         ),
 
-        // Positioned(
-        //   right: 5.w,
-        //   top: 6.h,
-        //   child: GestureDetector(
-        //     onTap: () {
-        //       buildShowModalBottomSheet(context);
-        //     },
-        //     child: Container(
-        //         width: 60.w,
-        //         height: 30.h,
-        //         decoration: BoxDecoration(
-        //           color: kPrimary,
-        //           border: Border.all(color: kTertiary.withOpacity(0.1)),
-        //           borderRadius: BorderRadius.circular(7.r),
-        //         ),
-        //         child: Center(
-        //           child: ReusableText(
-        //               text: "ADD",
-        //               style: appStyle(14, kWhite, FontWeight.bold)),
-        //         )),
-        //   ),
-        // ),
+        Positioned(
+          right: 5.w,
+          bottom: 10.h,
+          child: GestureDetector(
+            onTap: () {
+              buildShowModalBottomSheet(context);
+            },
+            child: Container(
+                width: 60.w,
+                height: 30.h,
+                decoration: BoxDecoration(
+                  color: kPrimary,
+                  border: Border.all(color: kTertiary.withOpacity(0.1)),
+                  borderRadius: BorderRadius.circular(7.r),
+                ),
+                child: Center(
+                  child: ReusableText(
+                      text: "ADD",
+                      style: appStyle(14, kWhite, FontWeight.bold)),
+                )),
+          ),
+        ),
       ],
     );
   }
@@ -328,7 +328,7 @@ class _FoodTileWidgetState extends State<FoodTileWidget> {
                     // ),
 
                     //-------------------------- Image Section --------------------
-                    Container(
+                    SizedBox(
                       height: 140.h,
                       width: MediaQuery.of(context).size.width,
                       child: Stack(
@@ -543,7 +543,7 @@ class _FoodTileWidgetState extends State<FoodTileWidget> {
                                     "baseTotalPrice": finalPrice,
                                     "quantityPrice": finalPrice,
                                     "foodPrice": widget.food["price"],
-                                    "resId": widget.food["resId"],
+                                    "venId": widget.food["venId"],
                                     "foodCalories": widget.food["foodCalories"],
                                     "isVeg": widget.food["isVeg"],
                                     "userId": currentUId,

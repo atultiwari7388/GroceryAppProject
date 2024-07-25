@@ -44,7 +44,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     List<Widget> screens = [
       HomeScreen(setTab: setTab),
       OrdersScreen(setTab: setTab),
-      const ItemsScreen()
+      const ItemsScreen(),
+      const ProfileScreen()
     ];
 
     return Scaffold(
@@ -63,6 +64,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           BottomNavigationBarItem(
               icon: Icon(AntDesign.shoppingcart), label: "Orders"),
           BottomNavigationBarItem(icon: Icon(AntDesign.book), label: "Items"),
+          BottomNavigationBarItem(icon: Icon(AntDesign.user), label: "Profile"),
         ],
         currentIndex: tab,
         selectedItemColor: kSecondary,

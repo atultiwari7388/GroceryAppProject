@@ -54,6 +54,7 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
   String? driverId;
   var logger = Logger();
   double dist = 0.0;
+  String phoneNumber = "";
 
   @override
   void initState() {
@@ -81,6 +82,7 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
 
       setState(() {
         dist = distance;
+        phoneNumber = driverSnapshot["phoneNumber"];
       });
       logger.i("Calculating distance and check if user is within 5 km range  " +
           dist.toString() +
@@ -420,8 +422,8 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
   }
 
   Future<void> showDeliveryTimeDialog() async {
-    final TextEditingController _controller = TextEditingController();
-    bool isButtonDisabled = true;
+    final TextEditingController _controller = TextEditingController(text: "10");
+    // bool isButtonDisabled = true;
 
     await showDialog(
       context: context,
@@ -433,7 +435,7 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
             keyboardType: TextInputType.number,
             onChanged: (value) {
               setState(() {
-                isButtonDisabled = value.isEmpty;
+                // isButtonDisabled = value.isEmpty;
               });
             },
             decoration: const InputDecoration(
@@ -450,13 +452,18 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
                   borderRadius: BorderRadius.circular(10.0.r),
                 ),
               ),
-              onPressed: isButtonDisabled
-                  ? null
-                  : () {
-                      String deliveryTime = _controller.text;
-                      Navigator.of(context).pop();
-                      _acceptOrder(deliveryTime);
-                    },
+              onPressed: () {
+                String deliveryTime = _controller.text;
+                Navigator.of(context).pop();
+                _acceptOrder(deliveryTime);
+              },
+              // onPressed: isButtonDisabled
+              //     ? null
+              //     : () {
+              //         String deliveryTime = _controller.text;
+              //         Navigator.of(context).pop();
+              //         _acceptOrder(deliveryTime);
+              //       },
               child: const Text('Continue'),
             ),
           ],
@@ -474,6 +481,7 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
           .update({
         'dDeliveryTime': int.parse(deliveryTime),
         'driverId': currentUId,
+        "driverPhoneNumber": phoneNumber.toString(),
         'status': 2,
       });
 
@@ -485,6 +493,7 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
           .update({
         'dDeliveryTime': int.parse(deliveryTime),
         'driverId': currentUId,
+        "driverPhoneNumber": phoneNumber.toString(),
         'status': 2,
       });
       showToastMessage("Success", "Order accepted", Colors.green);

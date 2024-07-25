@@ -3,16 +3,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class FirebaseCollectionServices {
   //for users Collection
   final Stream<QuerySnapshot> usersList =
-  FirebaseFirestore.instance.collection('Users').snapshots();
+      FirebaseFirestore.instance.collection('Users').snapshots();
 
   final Stream<QuerySnapshot> managerList =
-  FirebaseFirestore.instance.collection('Managers').snapshots();
+      FirebaseFirestore.instance.collection('Managers').snapshots();
 
   final Stream<QuerySnapshot> driverList =
-  FirebaseFirestore.instance.collection('Drivers').snapshots();
+      FirebaseFirestore.instance.collection('Drivers').snapshots();
 
   final Stream<QuerySnapshot> ordersList =
-  FirebaseFirestore.instance.collection('orders').snapshots();
+      FirebaseFirestore.instance.collection('orders').snapshots();
 
   final Stream<QuerySnapshot> pendingOrdersList = FirebaseFirestore.instance
       .collection('orders')
@@ -21,46 +21,46 @@ class FirebaseCollectionServices {
 
 //for managers collection
   final CollectionReference allManagersList =
-  FirebaseFirestore.instance.collection("Managers");
+      FirebaseFirestore.instance.collection("Managers");
 
   //for restaurants collection
   final CollectionReference allRestaurantList =
-  FirebaseFirestore.instance.collection("Restaurants");
+      FirebaseFirestore.instance.collection("Restaurants");
 
   //for categories collection
   final CollectionReference allCategoriesList =
-  FirebaseFirestore.instance.collection("Categories");
+      FirebaseFirestore.instance.collection("Categories");
 // for subcategories collection
   final CollectionReference allSubCategoriesList =
-  FirebaseFirestore.instance.collection("SubCategories");
+      FirebaseFirestore.instance.collection("SubCategories");
 
 // for items collection
   final CollectionReference allItemsList =
-  FirebaseFirestore.instance.collection("Items");
+      FirebaseFirestore.instance.collection("Items");
 //for orders collection
   final CollectionReference allOrdersList =
-  FirebaseFirestore.instance.collection("orders");
+      FirebaseFirestore.instance.collection("orders");
 //for coupons collection
   final CollectionReference allCouponsList =
-  FirebaseFirestore.instance.collection("coupons");
+      FirebaseFirestore.instance.collection("coupons");
 
   //for coupons collection
   final CollectionReference allDriversList =
-  FirebaseFirestore.instance.collection("Drivers");
+      FirebaseFirestore.instance.collection("Drivers");
 
   //for coupons collection
-  final CollectionReference allDriversSecondTestingList =
-  FirebaseFirestore.instance.collection("Drivers2");
+  final CollectionReference allVendorsList =
+      FirebaseFirestore.instance.collection("Vendors");
 
   //for coupons collection
   final CollectionReference allCustomersList =
-  FirebaseFirestore.instance.collection("Users");
+      FirebaseFirestore.instance.collection("Users");
 
   //for coupons collection
   final CollectionReference allBannerList =
-  FirebaseFirestore.instance.collection("homeSliders");
+      FirebaseFirestore.instance.collection("homeSliders");
 
   //for coupons collection
   final CollectionReference allPaymentsList =
-  FirebaseFirestore.instance.collection("Payments");
+      FirebaseFirestore.instance.collection("Payments");
 }

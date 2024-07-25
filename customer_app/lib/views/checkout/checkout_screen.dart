@@ -544,7 +544,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                                 shadowColor: Colors.transparent,
                               ),
                               child: Text("Place Order",
-                                  style: appStyle(16, kDark, FontWeight.w500)),
+                                  style: appStyle(16, kWhite, FontWeight.w500)),
                             ),
                           ),
                   ],
@@ -890,13 +890,13 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                     // margin: EdgeInsets.all(2.h),
                     padding: EdgeInsets.all(8.h),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
+                      gradient: LinearGradient(
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                         colors: [
-                          kPrimary,
-                          kPrimary,
-                          kPrimary,
+                          kTertiary.withOpacity(0.1),
+                          kTertiary.withOpacity(0.1),
+                          kTertiary.withOpacity(0.1),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(10.r),
@@ -904,16 +904,16 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                     child: Column(
                       children: [
                         reusbaleRowTextWidget("SubTotal :",
-                            "₹${subtotal.round().toStringAsFixed(2)}", kWhite),
+                            "₹${subtotal.round().toStringAsFixed(2)}", kDark),
 
                         SizedBox(height: 3.h),
                         isDeliveryChargesApplied
                             ? reusbaleRowTextWidget(
                                 "Delivery Charges  :",
                                 "₹${deliveryCharges.round().toStringAsFixed(2)}",
-                                Colors.yellow)
+                                kTertiary)
                             : reusbaleRowTextWidget(
-                                "Delivery Charges  :", "0", Colors.yellow),
+                                "Delivery Charges  :", "0", kTertiary),
                         SizedBox(height: 3.h),
                         reusbaleRowTextWidget(
                             "GST($gstCharges%)  :",
@@ -936,9 +936,9 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text("Total Bill :",
-                                style: appStyle(16, kWhite, FontWeight.bold)),
+                                style: appStyle(16, kPrimary, FontWeight.bold)),
                             Text("₹${totalBill.round().toStringAsFixed(2)}",
-                                style: appStyle(16, kWhite, FontWeight.bold)),
+                                style: appStyle(16, kPrimary, FontWeight.bold)),
                           ],
                         ),
                       ],
@@ -1197,7 +1197,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                       hintText: "Enter Coupon Code",
                       hintStyle: appStyle(15, kDark, FontWeight.normal),
                       enabledBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(color: kSecondary),
+                        borderSide: BorderSide(color: kPrimary),
                         borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
                     ),
@@ -1230,7 +1230,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                           shadowColor: Colors.transparent,
                         ),
                         child: Text("Apply",
-                            style: appStyle(16, kDark, FontWeight.w500)),
+                            style: appStyle(16, kWhite, FontWeight.w500)),
                       ),
                     ),
 
@@ -1283,7 +1283,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                       border: Border.all(color: kSecondary),
                     ),
                     child: Text("view more",
-                        style: appStyle(12, kSecondary, FontWeight.normal)),
+                        style: appStyle(12, kPrimary, FontWeight.normal)),
                   )),
             ],
           ),

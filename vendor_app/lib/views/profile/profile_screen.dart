@@ -9,6 +9,7 @@ import '../../services/collection_reference.dart';
 import '../../utils/app_style.dart';
 import '../../utils/toast_msg.dart';
 import '../auth/phone_auth_screen.dart';
+import '../payoutMode/payout_mode_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -73,6 +74,13 @@ class ProfileScreen extends StatelessWidget {
                     //     duration: const Duration(milliseconds: 900)),
                     // ),
                     buildListTile("assets/star.png", "Your Ratings", () {}),
+                    buildListTile(
+                      "assets/money.png",
+                      "Payout",
+                      () => Get.to(() => const PayoutModeScreen(),
+                          transition: Transition.cupertino,
+                          duration: const Duration(milliseconds: 900)),
+                    ),
                     //   () => Get.to(() => AllRatingsScreen(),
                     //       transition: Transition.cupertino,
                     //       duration: const Duration(milliseconds: 900)),
