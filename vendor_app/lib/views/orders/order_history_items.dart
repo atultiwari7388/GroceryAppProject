@@ -61,6 +61,7 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
   void initState() {
     super.initState();
     fetchVendorLocationDetails();
+    getVendorCommissionCharges();
   }
 
   void fetchVendorLocationDetails() async {
@@ -134,6 +135,35 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
     double distance = calculateDistance(userLat, userLong, restLat, restLong);
     logger.d("Total distance: ${distance}km");
     return distance <= 5;
+  }
+
+  Future<Map<String, dynamic>?> getVendorCommissionCharges() async {
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('settings')
+          .doc('adminVendorComCharges')
+          .get();
+
+      if (snapshot.exists) {
+        logger.i(snapshot.data());
+        return snapshot.data() as Map<String, dynamic>;
+      }
+    } catch (e) {
+      logger.e("Error fetching vendor commission charges: $e");
+    }
+    return null;
+  }
+
+  // Function to determine the appropriate charge based on the order value
+  Map<String, dynamic>? getApplicableCharge(
+      Map<String, dynamic> charges, num orderValue) {
+    for (var charge in charges.values) {
+      if (orderValue >= charge['orderMinVal'] &&
+          orderValue <= charge['orderMaxVal']) {
+        return charge;
+      }
+    }
+    return null;
   }
 
   @override
@@ -420,10 +450,16 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
     );
   }
 
-  void _acceptOrder(int status, foodPreparingTime) async {
+  // Method to accept the order and update the status in Firestore
+  void _acceptOrder(int status, String foodPreparingTime) async {
     try {
-      // Update values in the orders collection
       int otp = generateOTP();
+      logger.i("Generated OTP: $otp");
+
+      // Log the values being used to update Firestore
+      logger.i(
+          "Order update details: venId: $currentUId, vendorName: $vendorName, venLocation: $vendorAddress, venPhoneNumber: $venPhoneNumber, venLat: $venLat, venLong: $venLong, status: 1, time: $foodPreparingTime");
+
       await FirebaseFirestore.instance
           .collection('orders')
           .doc(widget.orderId)
@@ -437,27 +473,70 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
         "otp": otp,
         'status': 1,
         'time': foodPreparingTime.toString(),
+      }).then((value) async {
+        logger.i("Updating user history for userId: ${widget.userId}");
+        await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(widget.userId)
+            .collection('history')
+            .doc(widget.orderId)
+            .update({
+          'venId': currentUId.toString(),
+          'vendorName': vendorName.toString(),
+          "venLocation": vendorAddress,
+          "venPhoneNumber": venPhoneNumber.toString(),
+          "venLat": venLat,
+          "venLong": venLong,
+          "otp": otp,
+          'status': 1,
+          'time': foodPreparingTime.toString(),
+        }).then((value) async {
+          // Fetch the vendor commission charges
+          Map<String, dynamic>? vendorCharges =
+              await getVendorCommissionCharges();
+          logger.i("Fetched vendorCharges: $vendorCharges");
+
+          if (vendorCharges != null) {
+            // Get the applicable charge based on the total order value
+            Map<String, dynamic>? applicableCharge =
+                getApplicableCharge(vendorCharges, widget.totalPrice);
+            logger.i(
+                "Applicable charge for order value ${widget.totalPrice}: $applicableCharge");
+
+            if (applicableCharge != null) {
+              // Ensure the applicable charge is not null before using it
+              final charge = applicableCharge['vendorCharge'] ?? 0;
+              final cTypeCharge = applicableCharge['cType'] ?? 0;
+              // Log the commission details before saving
+              logger.i(
+                  "Saving commission details: orderId: ${widget.orderId}, orderDate: ${widget.orderDate}, userId: ${widget.userId}, venId: $currentUId, venName: $vendorName, venPhoneNumber: $venPhoneNumber, orderValue: ${widget.totalPrice}, charge: $charge");
+
+              // Save the commission details in adminVendorOrderComission
+              await FirebaseFirestore.instance
+                  .collection('adminVendorOrderComission')
+                  .add({
+                'orderId': widget.orderId,
+                'orderDate': widget.orderDate,
+                'userId': widget.userId,
+                'venId': currentUId,
+                'venName': vendorName,
+                'venPhoneNumber': venPhoneNumber,
+                'orderValue': widget.totalPrice,
+                'vCharge': charge,
+                "vendorCType": cTypeCharge.toString(),
+                'status': 0,
+              });
+
+              logger.i("Commission details saved successfully");
+            } else {
+              logger.e("No applicable charge found for the order value");
+            }
+          }
+        });
       });
 
-      await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(widget.userId)
-          .collection('history')
-          .doc(widget.orderId)
-          .update({
-        'venId': currentUId.toString(),
-        'vendorName': vendorName.toString(),
-        "venLocation": vendorAddress,
-        "venPhoneNumber": venPhoneNumber.toString(),
-        "venLat": venLat,
-        "venLong": venLong,
-        "otp": otp,
-        'status': 1,
-        'time': foodPreparingTime.toString(),
-      });
       widget.switchTab(1);
 
-      // Listen to the stream of the order document to get real-time updates
       final StreamSubscription<DocumentSnapshot> subscription =
           FirebaseFirestore.instance
               .collection('orders')
@@ -465,14 +544,13 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
               .snapshots()
               .listen((DocumentSnapshot orderSnapshot) {
         if (orderSnapshot.exists) {
-          // Update the UI with the new status
+          logger.i("Order snapshot updated: ${orderSnapshot.data()}");
           setState(() {
             status = orderSnapshot['status'];
           });
         }
       });
 
-      // Dispose the subscription when the widget is disposed
       WidgetsBinding.instance.addPostFrameCallback((_) {
         subscription.cancel();
       });
@@ -483,61 +561,66 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
     }
   }
 
-  // Future<void> _updateDriverEarnings(double fare, String paymentMode) async {
-  //   User? currentUser = FirebaseAuth.instance.currentUser;
-  //   if (currentUser == null) return;
-
-  //   String driverId = currentUser.uid;
-
-  //   DocumentReference driverRef =
-  //       FirebaseFirestore.instance.collection('Drivers').doc(driverId);
-
-  //   DocumentSnapshot driverDoc = await driverRef.get();
-  //   if (!driverDoc.exists) return;
-
-  //   Map<String, dynamic> data = driverDoc.data() as Map<String, dynamic>;
-
-  //   // Increment rideComplete count
-  //   num rideComplete = (data['orderCompleted'] ?? 0).toDouble();
-  //   rideComplete += 1;
-
-  //   // Increment totalRide count
-  //   num totalRide = (data['totalOrders'] ?? 0).toDouble();
-  //   totalRide += 1;
-
-  //   // Add fare to totalEarning
-  //   num totalEarning = (data['totalEarning'] ?? 0.0).toDouble();
-  //   totalEarning += fare;
-
-  //   // Update earnings based on payment mode
-  //   if (paymentMode == 'cash') {
-  //     num offlinePayments = (data['offlinePayments'] ?? 0.0).toDouble();
-  //     offlinePayments += fare;
-
-  //     await driverRef.update({
-  //       'offlinePayments': offlinePayments,
+  // void _acceptOrder(int status, foodPreparingTime) async {
+  //   try {
+  //     // Update values in the orders collection
+  //     int otp = generateOTP();
+  //     await FirebaseFirestore.instance
+  //         .collection('orders')
+  //         .doc(widget.orderId)
+  //         .update({
+  //       'venId': currentUId.toString(),
+  //       'vendorName': vendorName.toString(),
+  //       "venLocation": vendorAddress,
+  //       "venPhoneNumber": venPhoneNumber.toString(),
+  //       "venLat": venLat,
+  //       "venLong": venLong,
+  //       "otp": otp,
+  //       'status': 1,
+  //       'time': foodPreparingTime.toString(),
   //     });
-  //   } else if (paymentMode == 'online') {
-  //     num onlinePayments = (data['onlinePayments'] ?? 0.0).toDouble();
-  //     onlinePayments += fare;
 
-  //     await driverRef.update({
-  //       'onlinePayments': onlinePayments,
+  //     await FirebaseFirestore.instance
+  //         .collection('Users')
+  //         .doc(widget.userId)
+  //         .collection('history')
+  //         .doc(widget.orderId)
+  //         .update({
+  //       'venId': currentUId.toString(),
+  //       'vendorName': vendorName.toString(),
+  //       "venLocation": vendorAddress,
+  //       "venPhoneNumber": venPhoneNumber.toString(),
+  //       "venLat": venLat,
+  //       "venLong": venLong,
+  //       "otp": otp,
+  //       'status': 1,
+  //       'time': foodPreparingTime.toString(),
   //     });
+  //     widget.switchTab(1);
+
+  //     // Listen to the stream of the order document to get real-time updates
+  //     final StreamSubscription<DocumentSnapshot> subscription =
+  //         FirebaseFirestore.instance
+  //             .collection('orders')
+  //             .doc(widget.orderId)
+  //             .snapshots()
+  //             .listen((DocumentSnapshot orderSnapshot) {
+  //       if (orderSnapshot.exists) {
+  //         // Update the UI with the new status
+  //         setState(() {
+  //           status = orderSnapshot['status'];
+  //         });
+  //       }
+  //     });
+
+  //     // Dispose the subscription when the widget is disposed
+  //     WidgetsBinding.instance.addPostFrameCallback((_) {
+  //       subscription.cancel();
+  //     });
+
+  //     showToastMessage("Success", "Order accepted", Colors.green);
+  //   } catch (error) {
+  //     logger.e("Error accepting order: $error");
   //   }
-
-  //   // Increment todaysEarning by fare
-  //   num todaysEarning = (data['todaysEarning'] ?? 0.0).toDouble();
-  //   todaysEarning += fare;
-
-  //   logger.d('Incrementing todaysEarning by $fare');
-
-  //   // Update the driver's document with the new data
-  //   await driverRef.update({
-  //     'totalEarning': totalEarning,
-  //     'todaysEarning': todaysEarning,
-  //     'orderCompleted': rideComplete,
-  //     'totalOrders': totalRide,
-  //   });
   // }
 }

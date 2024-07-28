@@ -55,11 +55,13 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
   var logger = Logger();
   double dist = 0.0;
   String phoneNumber = "";
+  String driverName = "";
 
   @override
   void initState() {
     super.initState();
     fetchDriverLocationDetails();
+    getDriverCommissionCharges();
   }
 
   void fetchDriverLocationDetails() async {
@@ -83,6 +85,7 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
       setState(() {
         dist = distance;
         phoneNumber = driverSnapshot["phoneNumber"];
+        driverName = driverSnapshot["userName"];
       });
       logger.i("Calculating distance and check if user is within 5 km range  " +
           dist.toString() +
@@ -128,6 +131,35 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
     double distance = calculateDistance(userLat, userLong, restLat, restLong);
     logger.d("Total distance: " + distance.toString() + "km");
     return distance <= 5;
+  }
+
+  Future<Map<String, dynamic>?> getDriverCommissionCharges() async {
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('settings')
+          .doc('adminDriverCharges')
+          .get();
+
+      if (snapshot.exists) {
+        logger.i(snapshot.data());
+        return snapshot.data() as Map<String, dynamic>;
+      }
+    } catch (e) {
+      logger.e("Error fetching driver commission charges: $e");
+    }
+    return null;
+  }
+
+  // Function to determine the appropriate charge based on the order value
+  Map<String, dynamic>? getApplicableCharge(
+      Map<String, dynamic> charges, num orderValue) {
+    for (var charge in charges.values) {
+      if (orderValue >= charge['orderMinVal'] &&
+          orderValue <= charge['orderMaxVal']) {
+        return charge;
+      }
+    }
+    return null;
   }
 
   @override
@@ -482,21 +514,65 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
         'dDeliveryTime': int.parse(deliveryTime),
         'driverId': currentUId,
         "driverPhoneNumber": phoneNumber.toString(),
+        "dName": driverName.toString(),
         'status': 2,
+      }).then((value) async {
+        await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(widget.userId)
+            .collection('history')
+            .doc(widget.orderId)
+            .update({
+          'dDeliveryTime': int.parse(deliveryTime),
+          'driverId': currentUId,
+          "driverPhoneNumber": phoneNumber.toString(),
+          "dName": driverName.toString(),
+          'status': 2,
+        }).then((value) async {
+          // Fetch the vendor commission charges
+          Map<String, dynamic>? driverCharges =
+              await getDriverCommissionCharges();
+          logger.i("Fetched driverCharges: $driverCharges");
+
+          if (driverCharges != null) {
+            // Get the applicable charge based on the total order value
+            Map<String, dynamic>? applicableCharge =
+                getApplicableCharge(driverCharges, widget.totalPrice);
+            logger.i(
+                "Applicable charge for order value ${widget.totalPrice}: $applicableCharge");
+
+            if (applicableCharge != null) {
+              // Ensure the applicable charge is not null before using it
+              final charge = applicableCharge['driverCharge'] ?? 0;
+
+              // Log the commission details before saving
+
+              // Save the commission details in adminVendorOrderComission
+              await FirebaseFirestore.instance
+                  .collection('adminDriverOrderComission')
+                  .add({
+                'orderId': widget.orderId,
+                'orderDate': widget.orderDate,
+                'userId': widget.userId,
+                'dId': currentUId,
+                'dName': driverName.toString(),
+                'dPhoneNumber': phoneNumber.toString(),
+                'orderValue': widget.totalPrice,
+                'dCharge': charge,
+                "driverCType": "Rs",
+                'status': 0,
+              });
+
+              logger.i("Commission details saved successfully");
+            } else {
+              logger.e("No applicable charge found for the order value");
+            }
+          }
+        });
+
+        showToastMessage("Success", "Order accepted", Colors.green);
       });
 
-      await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(widget.userId)
-          .collection('history')
-          .doc(widget.orderId)
-          .update({
-        'dDeliveryTime': int.parse(deliveryTime),
-        'driverId': currentUId,
-        "driverPhoneNumber": phoneNumber.toString(),
-        'status': 2,
-      });
-      showToastMessage("Success", "Order accepted", Colors.green);
       widget.switchTab(1);
     } catch (error) {
       logger.e("Error accepting order: $error");
