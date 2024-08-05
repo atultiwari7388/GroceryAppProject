@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer_app/common/reusable_row_widget.dart';
 import 'package:customer_app/views/dashboard/category/category_list.dart';
 import 'package:customer_app/views/dashboard/lowestPrice/lowest_price_list.dart';
+import 'package:customer_app/views/dashboard/trendingStore/trending_store_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geocoding/geocoding.dart';
@@ -205,18 +206,15 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                       SizedBox(height: 10.h),
                       const CategoryList(),
                       ReusableRowWidget(
-                          headingName: "Lowest Price",
-                          onTap: () {
-                            // Get.to(
-                            //   () => const AllCategoriesScreen(),
-                            //   transition: Transition.fadeIn,
-                            //   duration: const Duration(milliseconds: 900),
-                            // );
-                          }),
+                          headingName: "Lowest Price", onTap: () {}),
                       SizedBox(height: 5.h),
                       const LowestPriceList(),
+                      // SizedBox(height: 10.h),
+                      ReusableRowWidget(
+                          headingName: "Trending Store", onTap: () {}),
+                      SizedBox(height: 5.h),
+                      const TrendingStoreScreenList(),
                       SizedBox(height: 10.h),
-                      SizedBox(height: 100.h),
                     ],
                   ),
                 ),

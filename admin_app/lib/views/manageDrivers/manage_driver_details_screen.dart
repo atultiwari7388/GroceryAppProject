@@ -28,6 +28,7 @@ class _ManageDriversScreenState extends State<ManageDriversScreen> {
   void initState() {
     super.initState();
     _driverStream = _driverStreamData();
+    fetchDriverCharges();
   }
 
   Stream<List<DocumentSnapshot>> _driverStreamData() {
@@ -62,6 +63,23 @@ class _ManageDriversScreenState extends State<ManageDriversScreen> {
   void dispose() {
     super.dispose();
     searchController.dispose();
+  }
+
+  Future<Map<String, dynamic>?> fetchDriverCharges() async {
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('settings')
+          .doc('driverCharges')
+          .get();
+
+      if (snapshot.exists) {
+        log(snapshot.data().toString());
+        return snapshot.data() as Map<String, dynamic>;
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+    return null;
   }
 
   @override
@@ -481,6 +499,7 @@ class _ManageDriversScreenState extends State<ManageDriversScreen> {
     final driverPhone = driverData["phoneNumber"] ?? "";
     final driverEmail = driverData["email"] ?? "";
     final bool approved = driverData["approved"];
+    final docId = data.id;
 
     return TableRow(
       children: [
@@ -494,80 +513,81 @@ class _ManageDriversScreenState extends State<ManageDriversScreen> {
             value: approved,
             onChanged: (value) {
               if (value) {
+                _showDriverTypeDialog(docId, driverName);
                 // Show the popup to select driver type
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    String selectedType = "";
-                    return StatefulBuilder(
-                      builder: (context, setState) {
-                        return AlertDialog(
-                          title: Text('Select Driver Type'),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              ListTile(
-                                title: Text('Commission Based'),
-                                leading: Radio<String>(
-                                  value: 'Commission',
-                                  groupValue: selectedType,
-                                  onChanged: (String? value) {
-                                    setState(() {
-                                      selectedType = value!;
-                                    });
-                                  },
-                                ),
-                              ),
-                              ListTile(
-                                title: Text('Salaried'),
-                                leading: Radio<String>(
-                                  value: 'Salaried',
-                                  groupValue: selectedType,
-                                  onChanged: (String? value) {
-                                    setState(() {
-                                      selectedType = value!;
-                                    });
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                          actions: [
-                            TextButton(
-                              child: Text('Cancel'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                            TextButton(
-                              child: Text('Confirm'),
-                              onPressed: () {
-                                if (selectedType.isNotEmpty) {
-                                  data.reference.update({
-                                    'approved': value,
-                                    'cType': selectedType,
-                                  }).then((value) {
-                                    showToastMessage("Success", "Value updated",
-                                        Colors.green);
-                                  }).catchError((error) {
-                                    showToastMessage("Error",
-                                        "Failed to update value", Colors.red);
-                                  });
-                                  Navigator.of(context).pop();
-                                } else {
-                                  showToastMessage(
-                                      "Error",
-                                      "Please select a driver type",
-                                      Colors.red);
-                                }
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                );
+                // showDialog(
+                //   context: context,
+                //   builder: (BuildContext context) {
+                //     String selectedType = "";
+                //     return StatefulBuilder(
+                //       builder: (context, setState) {
+                //         return AlertDialog(
+                //           title: Text('Select Driver Type'),
+                //           content: Column(
+                //             mainAxisSize: MainAxisSize.min,
+                //             children: [
+                //               ListTile(
+                //                 title: Text('Commission Based'),
+                //                 leading: Radio<String>(
+                //                   value: 'Commission',
+                //                   groupValue: selectedType,
+                //                   onChanged: (String? value) {
+                //                     setState(() {
+                //                       selectedType = value!;
+                //                     });
+                //                   },
+                //                 ),
+                //               ),
+                //               ListTile(
+                //                 title: Text('Salaried'),
+                //                 leading: Radio<String>(
+                //                   value: 'Salaried',
+                //                   groupValue: selectedType,
+                //                   onChanged: (String? value) {
+                //                     setState(() {
+                //                       selectedType = value!;
+                //                     });
+                //                   },
+                //                 ),
+                //               ),
+                //             ],
+                //           ),
+                //           actions: [
+                //             TextButton(
+                //               child: Text('Cancel'),
+                //               onPressed: () {
+                //                 Navigator.of(context).pop();
+                //               },
+                //             ),
+                //             TextButton(
+                //               child: Text('Confirm'),
+                //               onPressed: () {
+                //                 if (selectedType.isNotEmpty) {
+                //                   data.reference.update({
+                //                     'approved': value,
+                //                     'cType': selectedType,
+                //                   }).then((value) {
+                //                     showToastMessage("Success", "Value updated",
+                //                         Colors.green);
+                //                   }).catchError((error) {
+                //                     showToastMessage("Error",
+                //                         "Failed to update value", Colors.red);
+                //                   });
+                //                   Navigator.of(context).pop();
+                //                 } else {
+                //                   showToastMessage(
+                //                       "Error",
+                //                       "Please select a driver type",
+                //                       Colors.red);
+                //                 }
+                //               },
+                //             ),
+                //           ],
+                //         );
+                //       },
+                //     );
+                //   },
+                // );
               } else {
                 // Update Firestore document when switch is turned off
                 data.reference.update({
@@ -587,123 +607,141 @@ class _ManageDriversScreenState extends State<ManageDriversScreen> {
     );
   }
 
-  // TableRow buildDriverTableRow(DocumentSnapshot data, int index) {
-  //   final driverData = data.data() as Map<String, dynamic>;
-  //   final serialNumber = index + 1;
-  //   final driverName = driverData["userName"] ?? "";
-  //   final driverPhone = driverData["phoneNumber"] ?? "";
-  //   final driverEmail = driverData["email"] ?? "";
-  //   final bool approved = driverData["approved"];
+  void _showDriverTypeDialog(String docId, String selectedDriverName) async {
+    // Fetch the commission charges from Firestore
+    Map<String, dynamic>? commissionCharges = await fetchDriverCharges();
+    if (commissionCharges == null) {
+      showToastMessage(
+          "Failed", "Failed to fetch commission charges", Colors.red);
+      return;
+    }
 
-  //   return TableRow(
-  //     children: [
-  //       buildTableCell(serialNumber.toString(), data),
-  //       buildTableCell(driverName, data),
-  //       buildTableCell(driverPhone, data),
-  //       buildTableCell(driverEmail, data),
-  //       // TableCell(
-  //       //   child: Switch(
-  //       //     value: approved,
-  //       //     onChanged: (value) {
-  //       //       setState(() {
-  //       //         // Update local state
-  //       //       });
-  //       //       data.reference.update({'approved': value}).then((value) {
-  //       //         showToastMessage("Success", "Value updated", Colors.green);
-  //       //       }).catchError((error) {
-  //       //         showToastMessage("Error", "Failed to update value", Colors.red);
-  //       //       });
-  //       //     },
-  //       //   ),
-  //       // ),
-  //       TableCell(
-  //         child: Switch(
-  //           key: UniqueKey(),
-  //           value: approved,
-  //           onChanged: (value) {
-  //             if (value) {
-  //               // Show the popup to select driver type
-  //               showDialog(
-  //                 context: context,
-  //                 builder: (BuildContext context) {
-  //                   String selectedType = "";
-  //                   return StatefulBuilder(
-  //                     builder: (context, setState) {
-  //                       return AlertDialog(
-  //                         title: Text('Select Driver Type'),
-  //                         content: Column(
-  //                           mainAxisSize: MainAxisSize.min,
-  //                           children: [
-  //                             ListTile(
-  //                               title: Text('CommissionType'),
-  //                               leading: Radio<String>(
-  //                                 value: 'CommissionType',
-  //                                 groupValue: selectedType,
-  //                                 onChanged: (String? value) {
-  //                                   setState(() {
-  //                                     selectedType = value!;
-  //                                   });
-  //                                 },
-  //                               ),
-  //                             ),
-  //                             ListTile(
-  //                               title: Text('SalaryType'),
-  //                               leading: Radio<String>(
-  //                                 value: 'SalaryType',
-  //                                 groupValue: selectedType,
-  //                                 onChanged: (String? value) {
-  //                                   setState(() {
-  //                                     selectedType = value!;
-  //                                   });
-  //                                 },
-  //                               ),
-  //                             ),
-  //                           ],
-  //                         ),
-  //                         actions: [
-  //                           TextButton(
-  //                             child: Text('Cancel'),
-  //                             onPressed: () {
-  //                               Navigator.of(context).pop();
-  //                             },
-  //                           ),
-  //                           TextButton(
-  //                             child: Text('Confirm'),
-  //                             onPressed: () {
-  //                               if (selectedType != null) {
-  //                                 data.reference.update({
-  //                                   'approved': value,
-  //                                   'cType': selectedType,
-  //                                 }).then((value) {
-  //                                   showToastMessage("Success", "Value updated",
-  //                                       Colors.green);
-  //                                 });
+    // Extract the commission charge percentages
+    List<String> commissionList =
+        commissionCharges['charges']?.cast<String>() ?? [];
 
-  //                                 Navigator.of(context).pop();
-  //                               } else {
-  //                                 setState(() {});
-  //                                 showToastMessage(
-  //                                     "Error",
-  //                                     "Please select a driver type",
-  //                                     Colors.red);
-  //                               }
-  //                             },
-  //                           ),
-  //                         ],
-  //                       );
-  //                     },
-  //                   );
-  //                 },
-  //               );
-  //             } else {
-  //               setState(() {});
-  //             }
-  //           },
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        String selectedVendorType = '';
+        String? selectedCommission;
+        bool isCommissionBased = false;
+        TextEditingController salaryController = TextEditingController();
+
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: Text("Driver Approval"),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
+                        labelText: 'Select Driver Type',
+                      ),
+                      value: selectedVendorType.isNotEmpty
+                          ? selectedVendorType
+                          : null,
+                      items: ['Salaried', 'PerOrderPay'].map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (newValue) {
+                        setState(() {
+                          selectedVendorType = newValue ?? '';
+                          isCommissionBased =
+                              selectedVendorType == 'PerOrderPay';
+                        });
+                      },
+                    ),
+                    SizedBox(height: 10),
+                    if (selectedVendorType == 'Salaried')
+                      TextField(
+                        controller: salaryController,
+                        decoration: InputDecoration(
+                          labelText: 'Enter Salary Amount',
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                    if (isCommissionBased)
+                      DropdownButtonFormField<String>(
+                        decoration: InputDecoration(
+                          labelText: 'Select per order pay RS',
+                        ),
+                        value: selectedCommission,
+                        items: commissionList.map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (newValue) {
+                          setState(() {
+                            selectedCommission = newValue;
+                          });
+                        },
+                      ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  child: Text("Cancel"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: Text("Submit"),
+                  onPressed: () async {
+                    if (selectedVendorType.isEmpty) {
+                      showToastMessage(
+                          "Error", "Please select a vendor type", Colors.red);
+                      return;
+                    }
+                    if (selectedVendorType == 'Salaried' &&
+                        salaryController.text.isEmpty) {
+                      showToastMessage(
+                          "Error", "Please enter a salary amount", Colors.red);
+                      return;
+                    }
+                    if (isCommissionBased && selectedCommission == null) {
+                      showToastMessage("Error",
+                          "Please select a commission charge", Colors.red);
+                      return;
+                    }
+
+                    try {
+                      await FirebaseCollectionServices()
+                          .allDriversList
+                          .doc(docId)
+                          .update({
+                        'approved': true,
+                        'cType': selectedVendorType,
+                        if (selectedVendorType == 'Salaried')
+                          'cTypeValue': salaryController.text,
+                        if (isCommissionBased) 'cTypeValue': selectedCommission,
+                      });
+                      showToastMessage("Success",
+                          "Vendor Approved Successfully", Colors.green);
+                    } catch (e) {
+                      showToastMessage(
+                          "Error", "Failed to approve vendor: $e", Colors.red);
+                    }
+
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 
   Widget buildTableCell(String text, DocumentSnapshot data) {
     return TableCell(

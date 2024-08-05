@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer_app/functions/calculate_discount_price.dart';
+import 'package:customer_app/views/vendorSection/vendor_details_screen.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -81,7 +82,7 @@ class _FoodTileWidgetState extends State<FoodTileWidget> {
       children: [
         GestureDetector(
           onTap: () {
-            // buildShowModalBottomSheet(context);
+            buildShowModalBottomSheet(context);
           },
           child: Container(
             margin:
@@ -155,11 +156,13 @@ class _FoodTileWidgetState extends State<FoodTileWidget> {
                       SizedBox(height: 10.h),
                       SizedBox(
                         // color: kPrimary,
-                        // width: width * 0.2,
-                        width: 70.w,
-                        height: 25.h,
+                        width: width * 0.4,
+                        // width: double.maxFinite,
+                        height: 17.h,
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
+                          physics: BouncingScrollPhysics(),
+                          shrinkWrap: true,
                           itemCount: widget.food["foodCalories"].length,
                           itemBuilder: (ctx, i) {
                             final tag = widget.food["foodCalories"][i];
@@ -175,7 +178,7 @@ class _FoodTileWidgetState extends State<FoodTileWidget> {
                                   child: ReusableText(
                                       text: tag,
                                       style:
-                                          appStyle(8, kGray, FontWeight.w400)),
+                                          appStyle(7, kGray, FontWeight.w400)),
                                 ),
                               ),
                             );
@@ -255,6 +258,13 @@ class _FoodTileWidgetState extends State<FoodTileWidget> {
     double discountPercentage =
         calculateDiscountPercentage(oldPrice.toDouble(), price.toDouble());
 
+    // Fetch Vendor Details
+    final vendorDoc = await FirebaseFirestore.instance
+        .collection('Vendors')
+        .doc(widget.food["venId"])
+        .get();
+    final vendorData = vendorDoc.data()!;
+
     return showModalBottomSheet(
       context: context,
       constraints: BoxConstraints(maxHeight: 700.h),
@@ -308,26 +318,6 @@ class _FoodTileWidgetState extends State<FoodTileWidget> {
                     SizedBox(height: 10.h),
 
                     //-------------------------- Image Section --------------------
-                    // Center(
-                    //   child: Container(
-                    //     padding: EdgeInsets.all(5.h),
-                    //     decoration: BoxDecoration(
-                    //       border: Border.all(color: kGrayLight),
-                    //       borderRadius: BorderRadius.circular(12.r),
-                    //     ),
-                    //     height: 140.h,
-                    //     width: MediaQuery.of(context).size.width,
-                    //     child: ClipRRect(
-                    //       borderRadius: BorderRadius.circular(12.r),
-                    //       child: Image.network(
-                    //         widget.food["image"],
-                    //         fit: BoxFit.cover,
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
-
-                    //-------------------------- Image Section --------------------
                     SizedBox(
                       height: 140.h,
                       width: MediaQuery.of(context).size.width,
@@ -368,6 +358,49 @@ class _FoodTileWidgetState extends State<FoodTileWidget> {
                               ),
                             ),
                           ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 20.h),
+
+                    //===================== Vendor Details ========================
+                    //vendor Details
+                    GestureDetector(
+                      onTap: () {
+                        Get.to(
+                          () => VendorsDetailsScreen(
+                              vendorId: vendorData["uid"],
+                              vendorName: vendorData["userName"]),
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 25.r,
+                            backgroundColor: kTertiary.withOpacity(0.1),
+                            backgroundImage: NetworkImage(
+                              vendorData["profilePicture"].isEmpty
+                                  ? 'https://firebasestorage.googleapis.com/v0/b/groceryapp-july.appspot.com/o/new_logo_f.png?alt=media&token=a501618a-8e24-4956-9afa-3de0027dcb4c' // Replace with your default image URL
+                                  : vendorData["profilePicture"],
+                            ),
+                          ),
+                          SizedBox(width: 10.w),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(vendorData["userName"],
+                                  style:
+                                      appStyle(17, kDark, FontWeight.normal)),
+                              Text("Explore All Products",
+                                  style: appStyle(
+                                      12, kTertiary, FontWeight.normal))
+                            ],
+                          ),
+                          Spacer(),
+                          IconButton(
+                              onPressed: () {},
+                              icon: Icon(Icons.arrow_forward_ios))
                         ],
                       ),
                     ),
@@ -474,6 +507,7 @@ class _FoodTileWidgetState extends State<FoodTileWidget> {
                       _buildAddOnCard(context, setState),
                       SizedBox(height: 20.h),
                     ],
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

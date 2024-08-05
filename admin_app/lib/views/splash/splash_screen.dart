@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../../constants/constants.dart';
 import '../adminHome/admin_home_screen.dart';
 import '../appSideAdminHome/app_side_admin_home_dashboard.dart';
 import '../authentication/authentication_screen.dart';
@@ -21,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _initializeApp() async {
     // Add a delay of 5 seconds
-    await Future.delayed(const Duration(seconds: 5));
+    await Future.delayed(const Duration(seconds: 2));
 
     // Check if user is already logged in
     User? user = FirebaseAuth.instance.currentUser;
@@ -70,8 +71,19 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     // Placeholder widget while waiting for initialization
     return Scaffold(
-      body: Center(
-        child: CircularProgressIndicator(),
+      backgroundColor: kWhite,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+            child: Image.asset(
+              "assets/logo-no-background.png",
+              height: 300,
+              fit: BoxFit.cover,
+            ),
+          ),
+          SizedBox(height: 30),
+        ],
       ),
     );
   }

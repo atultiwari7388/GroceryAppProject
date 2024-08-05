@@ -5,10 +5,10 @@ import '../utils/app_style.dart';
 class CustomGradientButton extends StatelessWidget {
   const CustomGradientButton(
       {super.key,
-        required this.text,
-        required this.onPress,
-        required this.h,
-        required this.w});
+      required this.text,
+      required this.onPress,
+      required this.h,
+      required this.w});
 
   final String text;
   final void Function()? onPress;
@@ -42,7 +42,7 @@ class CustomGradientButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          child: Text(text, style: appStyle(16, kDark, FontWeight.w500)),
+          child: Text(text, style: appStyle(16, kWhite, FontWeight.w500)),
         ),
       ),
     );

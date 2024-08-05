@@ -14,6 +14,7 @@ import '../../services/collection_ref.dart';
 import '../../utils/app_style.dart';
 import '../../utils/toast_msg.dart';
 import '../address/address_management_screen.dart';
+import '../coupons/coupons_screen.dart';
 import '../success/success_screen.dart';
 import 'checkout_functionality.dart';
 
@@ -1265,16 +1266,16 @@ class _CheckoutScreenState extends State<CheckoutScreen>
               ),
               TextButton(
                   onPressed: () async {
-                    // final selectedCoupon = await Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => CouponScreen(
-                    //       onCouponSelected: (couponCode) {
-                    //         _couponController.text = couponCode.toString();
-                    //       },
-                    //     ),
-                    //   ),
-                    // );
+                    final selectedCoupon = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CouponScreen(
+                          onCouponSelected: (couponCode) {
+                            _couponController.text = couponCode.toString();
+                          },
+                        ),
+                      ),
+                    );
                   },
                   child: Container(
                     padding: EdgeInsets.all(3.h),

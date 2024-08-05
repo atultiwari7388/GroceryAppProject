@@ -1,6 +1,7 @@
 import 'package:admin_app/services/firebase_collection_services.dart';
 import 'package:admin_app/utils/app_style.dart';
 import 'package:admin_app/views/category/categories_screen.dart';
+import 'package:admin_app/views/coupons/manage_coupons_screen.dart';
 import 'package:admin_app/views/items/manage_items.dart';
 import 'package:admin_app/views/manageDrivers/manage_driver_details_screen.dart';
 import 'package:admin_app/views/manageOrders/manage_orders.dart';
@@ -94,6 +95,8 @@ class _AppSideAdminDashBoardScreenState
                   // () => Get.to(() => ManageOrdersScreen()),
                   ),
               buildListTile(Icons.bookmark_add_rounded, "Banners", () {}),
+              buildListTile(Icons.airplane_ticket_outlined, "Coupons",
+                  () => Get.to(() => ManageCouponsScreen())),
             ],
           ),
         ),

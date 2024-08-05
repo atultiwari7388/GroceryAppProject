@@ -235,7 +235,7 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
                                     : widget.status == 2
                                         ? Colors.blue
                                         : widget.status == 3
-                                            ? Colors.yellow
+                                            ? kPrimary
                                             : widget.status == 4
                                                 ? Colors.blue
                                                 : widget.status == 5
