@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer_app/common/reusable_row_widget.dart';
 import 'package:customer_app/views/dashboard/category/category_list.dart';
+import 'package:customer_app/views/dashboard/category/category_page.dart';
 import 'package:customer_app/views/dashboard/lowestPrice/lowest_price_list.dart';
 import 'package:customer_app/views/dashboard/trendingStore/trending_store_screen.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ import '../../utils/toast_msg.dart';
 import '../address/address_management_screen.dart';
 import '../profile/profile_screen.dart';
 import 'category/all_category_screen.dart';
+import 'subCategory/all_sub_category_screen.dart';
 
 class DashBoardScreen extends StatefulWidget {
   const DashBoardScreen({super.key});
@@ -30,9 +32,10 @@ class DashBoardScreen extends StatefulWidget {
 
 class _DashBoardScreenState extends State<DashBoardScreen> {
   final TextEditingController searchController = TextEditingController();
+  String searchText = '';
+  List<DocumentSnapshot> searchResults = [];
 
   // bool _showMenu = false;
-  String searchText = '';
   String appbarTitle = "";
   bool firstTimeAppLaunch = true; // Boolean flag to track first app launch
   bool isLocationSet = false;
@@ -45,6 +48,63 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     super.initState();
     checkIfLocationIsSet();
     // fetchNearByRestaurantsLocation();
+  }
+
+  void searchFromFirebase(String query) async {
+    if (query.isNotEmpty) {
+      // Fetch categories that match the search text
+      QuerySnapshot categorySnapshot = await FirebaseFirestore.instance
+          .collection('Categories')
+          .where('categoryName', isGreaterThanOrEqualTo: query)
+          .where('categoryName', isLessThanOrEqualTo: query + '\uf8ff')
+          .get();
+
+      // Fetch item names that match the search text
+      QuerySnapshot itemSnapshot = await FirebaseFirestore.instance
+          .collection('Items')
+          .where('title', isGreaterThanOrEqualTo: query)
+          .where('title', isLessThanOrEqualTo: query + '\uf8ff')
+          .get();
+
+      setState(() {
+        searchResults = [
+          ...categorySnapshot.docs,
+          ...itemSnapshot.docs,
+        ];
+      });
+    } else if (query.isEmpty) {
+      // Clear results if the query is empty
+      setState(() {
+        searchResults.clear();
+        searchController.clear();
+      });
+    } else {
+      setState(() {
+        searchResults.clear();
+        searchController.clear();
+      });
+    }
+  }
+
+  void _performSearch(String searchQuery) {
+    if (searchQuery.isEmpty) {
+      setState(() {
+        searchResults.clear();
+        searchController.clear();
+      });
+    } else {
+      final results = searchResults.where((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        final categoryName = data['categoryName']?.toLowerCase() ?? '';
+        final title = data['title']?.toLowerCase() ?? '';
+        return categoryName.contains(searchQuery) ||
+            title.contains(searchQuery);
+      }).toList();
+
+      setState(() {
+        searchResults = results;
+      });
+    }
   }
 
   Future<void> checkIfLocationIsSet() async {
@@ -175,6 +235,14 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    searchController.dispose();
+    searchResults.clear();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       // backgroundColor: kPrimary,
@@ -191,6 +259,38 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       buildTopSearchBar(),
+                      if (searchController.text.isNotEmpty)
+                        if (searchResults.isNotEmpty)
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: BouncingScrollPhysics(),
+                            itemCount: searchResults.length,
+                            itemBuilder: (context, index) {
+                              var data = searchResults[index].data()
+                                  as Map<String, dynamic>;
+                              return InkWell(
+                                onTap: () {
+                                  if (data.containsKey("categoryName") &&
+                                      data["categoryName"] != null) {
+                                    Get.to(() => CategoryPage(
+                                        categoryName: data['categoryName'],
+                                        catId: data['docId']));
+                                  } else if (data.containsKey("title") &&
+                                      data["title"] != null) {
+                                    Get.to(() => AllSubCategoriesScreen(
+                                        subCategoryId: data["subCategoryId"]));
+                                  }
+                                },
+                                child: ListTile(
+                                  title: Text(data['categoryName'] ??
+                                      data['title'] ??
+                                      ''),
+                                ),
+                              );
+                            },
+                          ),
+                      if (searchResults.isEmpty) SizedBox(),
+
                       SizedBox(height: 10.h),
                       buildImageSlider(),
                       SizedBox(height: 10.h),
@@ -420,6 +520,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   }
 
   /// -------------------------- Build Top Search Bar ----------------------------------*
+
   Widget buildTopSearchBar() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 5.0.w, vertical: 10.h),
@@ -436,18 +537,34 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
             ),
           ],
         ),
-        child: TextFormField(
-          controller: searchController,
-          onChanged: (value) {
-            setState(() {
-              searchText = value;
-            });
-          },
-          decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: "Search by item name",
-              prefixIcon: const Icon(Icons.search),
-              prefixStyle: appStyle(14, kDark, FontWeight.w200)),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                controller: searchController,
+                onChanged: (value) {
+                  searchFromFirebase(value);
+                  _performSearch(value);
+                },
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: "Search by item name or category name",
+                  prefixIcon: const Icon(Icons.search),
+                  prefixStyle: appStyle(14, kDark, FontWeight.w200),
+                ),
+              ),
+            ),
+            if (searchController.text.isNotEmpty)
+              IconButton(
+                icon: Icon(Icons.clear),
+                onPressed: () {
+                  setState(() {
+                    searchController.clear();
+                    searchResults.clear();
+                  });
+                },
+              ),
+          ],
         ),
       ),
     );

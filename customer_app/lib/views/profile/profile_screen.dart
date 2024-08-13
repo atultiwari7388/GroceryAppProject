@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:customer_app/privacy/privacy.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -8,7 +9,12 @@ import '../../constants/constants.dart';
 import '../../services/collection_ref.dart';
 import '../../utils/app_style.dart';
 import '../../utils/toast_msg.dart';
+import '../aboutUs/about_us.dart';
+import '../address/address_management_screen.dart';
 import '../auth/phone_authentication_screen.dart';
+import '../history/all_history_screen.dart';
+import '../notification/notification_screen.dart';
+import 'profile_details_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -35,15 +41,14 @@ class ProfileScreen extends StatelessWidget {
               SizedBox(height: 18.h),
               //top card
               GestureDetector(
-                  // onTap: () => Get.to(() => ProfileDetailsScreen(),
-                  //     transition: Transition.cupertino,
-                  //     duration: const Duration(milliseconds: 900)),
+                  onTap: () => Get.to(() => ProfileDetailsScreen(),
+                      transition: Transition.cupertino,
+                      duration: const Duration(milliseconds: 900)),
                   child: buildTopProfileSection()),
               SizedBox(height: 18.h),
 
               Container(
                 width: double.maxFinite,
-                // margin: EdgeInsets.symmetric(horizontal: 12.w),
                 padding: EdgeInsets.all(12.w),
                 decoration: BoxDecoration(
                   color: kLightWhite,
@@ -65,21 +70,23 @@ class ProfileScreen extends StatelessWidget {
                     SizedBox(height: 15.h),
                     const DashedDivider(color: kPrimary),
                     SizedBox(height: 10.h),
-                    buildListTile("Your Orders", () {}),
-                    // () => Get.to(() => AllOrderHistoryScreen(),
-                    //     transition: Transition.cupertino,
-                    //     duration: const Duration(milliseconds: 900))),
-
-                    buildListTile("Address Book", () {}),
-                    // () => Get.to(
-                    //     () => AddressManagementScreen(
-                    //         userLat: 0, userLng: 0),
-                    //     transition: Transition.cupertino,
-                    //     duration: const Duration(milliseconds: 900))),
-                    buildListTile("Your Profile", () {}),
-                    // () => Get.to(() => ProfileDetailsScreen(),
-                    //     transition: Transition.cupertino,
-                    //     duration: const Duration(milliseconds: 900))),
+                    buildListTile(
+                        "Your Orders",
+                        () => Get.to(() => AllOrderHistoryScreen(),
+                            transition: Transition.cupertino,
+                            duration: const Duration(milliseconds: 900))),
+                    buildListTile(
+                        "Address Book",
+                        () => Get.to(
+                            () =>
+                                AddressManagementScreen(userLat: 0, userLng: 0),
+                            transition: Transition.cupertino,
+                            duration: const Duration(milliseconds: 900))),
+                    buildListTile(
+                        "Your Profile",
+                        () => Get.to(() => ProfileDetailsScreen(),
+                            transition: Transition.cupertino,
+                            duration: const Duration(milliseconds: 900))),
                   ],
                 ),
               ),
@@ -108,20 +115,25 @@ class ProfileScreen extends StatelessWidget {
                     SizedBox(height: 15.h),
                     const DashedDivider(color: kPrimary),
                     SizedBox(height: 10.h),
-                    buildListTile("About us", () {}),
-                    // () => Get.to(() => AboutUsScreen(),
-                    //     transition: Transition.cupertino,
-                    //     duration: const Duration(milliseconds: 900))),
+                    buildListTile(
+                        "About us",
+                        () => Get.to(() => AboutUsScreen(),
+                            transition: Transition.cupertino,
+                            duration: const Duration(milliseconds: 900))),
                     buildListTile(
                         // ignore: avoid_print
                         "Send Feedback",
                         () => print("Send Feedback")),
-                    buildListTile("Privacy", () {}),
-                    buildListTile("Notification", () {}),
-                    // () => Get.to(() => NotificationScreen(),
-                    //     transition: Transition.cupertino,
-                    //     duration: const Duration(milliseconds: 900))),
-
+                    buildListTile(
+                        "Privacy",
+                        () => Get.to(() => PrivacyScreen(),
+                            transition: Transition.cupertino,
+                            duration: const Duration(milliseconds: 900))),
+                    buildListTile(
+                        "Notification",
+                        () => Get.to(() => NotificationScreen(),
+                            transition: Transition.cupertino,
+                            duration: const Duration(milliseconds: 900))),
                     buildListTile("Logout", () => signOut(context)),
                   ],
                 ),

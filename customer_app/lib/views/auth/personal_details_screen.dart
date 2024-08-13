@@ -18,10 +18,10 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kTertiary,
+        backgroundColor: kPrimary,
         iconTheme: const IconThemeData(color: kPrimary),
         title: Text('Personal Details',
-            style: appStyle(20, kDark, FontWeight.w500)),
+            style: appStyle(20, kWhite, FontWeight.w500)),
         elevation: 3,
         centerTitle: true,
       ),

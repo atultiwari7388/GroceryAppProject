@@ -45,8 +45,10 @@ class _OrdersScreenState extends State<OrdersScreen>
         });
 
         if (isVendorActive) {
-          ordersStream =
-              FirebaseFirestore.instance.collection('orders').snapshots();
+          ordersStream = FirebaseFirestore.instance
+              .collection('orders')
+              .where("venId", isEqualTo: currentUId)
+              .snapshots();
         }
       }
     });

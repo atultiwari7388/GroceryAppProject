@@ -30,13 +30,14 @@ class PhoneAuthenticationScreen extends StatelessWidget {
                   Expanded(
                     flex: 1,
                     child: Container(
+                      // margin: EdgeInsets.only(left: 20, right: 20),
                       decoration: const BoxDecoration(
                         borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(20),
                             topRight: Radius.circular(20)),
                         image: DecorationImage(
                           image: AssetImage("assets/logo-no-background.png"),
-                          fit: BoxFit.cover,
+                          fit: BoxFit.contain,
                         ),
                       ),
                     ),

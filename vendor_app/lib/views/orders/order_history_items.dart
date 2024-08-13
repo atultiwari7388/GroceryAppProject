@@ -56,6 +56,7 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
   String vendorName = "";
   String vendorAddress = "";
   String venPhoneNumber = "";
+  num vendorComissionPayValue = 0;
 
   @override
   void initState() {
@@ -89,6 +90,7 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
         vendorName = vendorSnapshot["userName"].toString();
         vendorAddress = vendorSnapshot["address"].toString();
         venPhoneNumber = vendorSnapshot["phoneNumber"].toString();
+        vendorComissionPayValue = vendorSnapshot["vTypeValue"];
       });
       logger.i(
           "Calculating distance and check if user is within 5 km range  $dist  km");
@@ -401,7 +403,6 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
 
   Future<void> showDeliveryTimeDialog() async {
     final TextEditingController _controller = TextEditingController();
-    // bool isButtonDisabled = true;
 
     await showDialog(
       context: context,
@@ -412,9 +413,7 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
             controller: _controller,
             keyboardType: TextInputType.number,
             onChanged: (value) {
-              setState(() {
-                // isButtonDisabled = value.isEmpty;
-              });
+              setState(() {});
             },
             decoration: const InputDecoration(
               hintText: 'Food preparing time in minutes (10)',
@@ -435,13 +434,6 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
                 Navigator.of(context).pop();
                 _acceptOrder(widget.status, deliveryTime);
               },
-              // onPressed: isButtonDisabled
-              //     ? null
-              //     : () {
-              //         String deliveryTime = _controller.text;
-              //         Navigator.of(context).pop();
-              //         _acceptOrder(widget.status, deliveryTime);
-              //       },
               child: const Text('Continue'),
             ),
           ],
@@ -450,93 +442,84 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
     );
   }
 
-  // Method to accept the order and update the status in Firestore
   void _acceptOrder(int status, String foodPreparingTime) async {
     try {
+      // Update values in the orders collection
       int otp = generateOTP();
-      logger.i("Generated OTP: $otp");
-
-      // Log the values being used to update Firestore
-      logger.i(
-          "Order update details: venId: $currentUId, vendorName: $vendorName, venLocation: $vendorAddress, venPhoneNumber: $venPhoneNumber, venLat: $venLat, venLong: $venLong, status: 1, time: $foodPreparingTime");
-
       await FirebaseFirestore.instance
           .collection('orders')
           .doc(widget.orderId)
           .update({
-        'venId': currentUId.toString(),
         'vendorName': vendorName.toString(),
-        "venLocation": vendorAddress,
-        "venPhoneNumber": venPhoneNumber.toString(),
-        "venLat": venLat,
-        "venLong": venLong,
-        "otp": otp,
+        'venLocation': vendorAddress,
+        'venPhoneNumber': venPhoneNumber.toString(),
+        'venLat': venLat,
+        'venLong': venLong,
+        'otp': otp,
         'status': 1,
         'time': foodPreparingTime.toString(),
       }).then((value) async {
-        logger.i("Updating user history for userId: ${widget.userId}");
         await FirebaseFirestore.instance
             .collection('Users')
             .doc(widget.userId)
             .collection('history')
             .doc(widget.orderId)
             .update({
-          'venId': currentUId.toString(),
           'vendorName': vendorName.toString(),
-          "venLocation": vendorAddress,
-          "venPhoneNumber": venPhoneNumber.toString(),
-          "venLat": venLat,
-          "venLong": venLong,
-          "otp": otp,
+          'venLocation': vendorAddress,
+          'venPhoneNumber': venPhoneNumber.toString(),
+          'venLat': venLat,
+          'venLong': venLong,
+          'otp': otp,
           'status': 1,
           'time': foodPreparingTime.toString(),
         }).then((value) async {
-          // Fetch the vendor commission charges
-          Map<String, dynamic>? vendorCharges =
-              await getVendorCommissionCharges();
-          logger.i("Fetched vendorCharges: $vendorCharges");
+          // Commission Calculation
+          num orderValue = widget.totalPrice;
+          num vendorCommissionPercentage = vendorComissionPayValue;
 
-          if (vendorCharges != null) {
-            // Get the applicable charge based on the total order value
-            Map<String, dynamic>? applicableCharge =
-                getApplicableCharge(vendorCharges, widget.totalPrice);
-            logger.i(
-                "Applicable charge for order value ${widget.totalPrice}: $applicableCharge");
+          num vendorComissionPay =
+              (orderValue * vendorCommissionPercentage) / 100;
+          num adminEarning = vendorComissionPay;
+          num vendorEarning = orderValue - vendorComissionPay;
 
-            if (applicableCharge != null) {
-              // Ensure the applicable charge is not null before using it
-              final charge = applicableCharge['vendorCharge'] ?? 0;
-              final cTypeCharge = applicableCharge['cType'] ?? 0;
-              // Log the commission details before saving
-              logger.i(
-                  "Saving commission details: orderId: ${widget.orderId}, orderDate: ${widget.orderDate}, userId: ${widget.userId}, venId: $currentUId, venName: $vendorName, venPhoneNumber: $venPhoneNumber, orderValue: ${widget.totalPrice}, charge: $charge");
+          // Initialize the driver commission values
+          num driverComissionPay = 0.0;
+          num driverComission = 0.0;
 
-              // Save the commission details in adminVendorOrderComission
-              await FirebaseFirestore.instance
-                  .collection('adminVendorOrderComission')
-                  .add({
-                'orderId': widget.orderId,
-                'orderDate': widget.orderDate,
-                'userId': widget.userId,
-                'venId': currentUId,
-                'venName': vendorName,
-                'venPhoneNumber': venPhoneNumber,
-                'orderValue': widget.totalPrice,
-                'vCharge': charge,
-                "vendorCType": cTypeCharge.toString(),
-                'status': 0,
-              });
+          // Store the commission data in the AdminCommission collection
+          Map<String, dynamic> commissionData = {
+            'totalPrice': orderValue,
+            'vendId': venId.toString(),
+            'vendName': vendorName,
+            'vendPhone': venPhoneNumber,
+            'status': 0,
+            'date': DateTime.now(),
+            'vendorEarning': vendorEarning,
+            "vCmPyToAdmin": vendorComissionPayValue,
+            'orderId': widget.orderId,
+            'driverComissionPay': driverComissionPay, //admin pay to driver
+            'driverId': "",
+            'driverName': "",
+            'driverComission': driverComission,
+            'adminEarning': adminEarning,
+            'shortfallAmount': 0,
+            'additionalPaymentRequired': false,
+          };
 
-              logger.i("Commission details saved successfully");
-            } else {
-              logger.e("No applicable charge found for the order value");
-            }
-          }
+          await FirebaseFirestore.instance
+              .collection('AdminCommission')
+              .doc(widget.orderId)
+              .set(commissionData);
+
+          logger.d(
+              "Order Value is $orderValue and vendor comission pay is $vendorComissionPayValue to admin and Admin Earning is $adminEarning ");
         });
       });
 
       widget.switchTab(1);
 
+      // Listen to the stream of the order document to get real-time updates
       final StreamSubscription<DocumentSnapshot> subscription =
           FirebaseFirestore.instance
               .collection('orders')
@@ -544,13 +527,14 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
               .snapshots()
               .listen((DocumentSnapshot orderSnapshot) {
         if (orderSnapshot.exists) {
-          logger.i("Order snapshot updated: ${orderSnapshot.data()}");
+          // Update the UI with the new status
           setState(() {
             status = orderSnapshot['status'];
           });
         }
       });
 
+      // Dispose the subscription when the widget is disposed
       WidgetsBinding.instance.addPostFrameCallback((_) {
         subscription.cancel();
       });
@@ -569,7 +553,6 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
   //         .collection('orders')
   //         .doc(widget.orderId)
   //         .update({
-  //       'venId': currentUId.toString(),
   //       'vendorName': vendorName.toString(),
   //       "venLocation": vendorAddress,
   //       "venPhoneNumber": venPhoneNumber.toString(),
@@ -586,7 +569,6 @@ class _HistoryScreenItemsState extends State<HistoryScreenItems> {
   //         .collection('history')
   //         .doc(widget.orderId)
   //         .update({
-  //       'venId': currentUId.toString(),
   //       'vendorName': vendorName.toString(),
   //       "venLocation": vendorAddress,
   //       "venPhoneNumber": venPhoneNumber.toString(),

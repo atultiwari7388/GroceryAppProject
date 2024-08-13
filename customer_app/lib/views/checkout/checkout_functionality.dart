@@ -24,6 +24,7 @@ Future<void> placeOrder(
   num delievryCharges,
   num gstAmountPrice,
   String time,
+  String venId,
 ) async {
   try {
     // Fetch cart items
@@ -74,7 +75,7 @@ Future<void> placeOrder(
       'userLat': userLatitude,
       'userLong': userLongitude,
       'restName': restName,
-      'venId': "",
+      'venId': venId.toString(),
       'payMode': payMode,
       'orderItems': cartItems,
       'orderDate': DateTime.now(),
@@ -110,7 +111,7 @@ Future<void> placeOrder(
       'userLat': userLatitude,
       'userLong': userLongitude,
       'restName': restName,
-      'venId': "",
+      'venId': venId.toString(),
       'payMode': payMode,
       'orderItems': cartItems,
       'orderDate': DateTime.now(),
@@ -121,7 +122,6 @@ Future<void> placeOrder(
       "paymentId": paymentId,
       "discountAmount": discountAmount,
       "discountValue": discountValue,
-      // "managerId": "",
       "vendorName": "",
       "driverId": "",
       "driverPhoneNumber": "",

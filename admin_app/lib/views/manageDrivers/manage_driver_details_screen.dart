@@ -23,6 +23,8 @@ class _ManageDriversScreenState extends State<ManageDriversScreen> {
   late Stream<List<DocumentSnapshot>> _driverStream;
   int _perPage = 10;
   int _currentPage = 0;
+  DateTime? _startDate;
+  DateTime? _endDate;
 
   @override
   void initState() {
@@ -46,7 +48,39 @@ class _ManageDriversScreenState extends State<ManageDriversScreen> {
       query = query.orderBy("created_at", descending: true);
     }
 
+    // Apply date range filter if both dates are selected
+    if (_startDate != null && _endDate != null) {
+      query = query
+          .where("created_at", isGreaterThanOrEqualTo: _startDate)
+          .where("updated_at",
+              isLessThanOrEqualTo:
+                  _endDate!.add(const Duration(days: 1))); // include end date
+    }
+
     return query.limit(_perPage).snapshots().map((snapshot) => snapshot.docs);
+  }
+
+  Future<void> _selectDateRange(BuildContext context) async {
+    final DateTimeRange? picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      initialDateRange: _startDate != null && _endDate != null
+          ? DateTimeRange(start: _startDate!, end: _endDate!)
+          : null,
+    );
+
+    if (picked != null &&
+        picked !=
+            DateTimeRange(
+                start: _startDate ?? DateTime.now(),
+                end: _endDate ?? DateTime.now())) {
+      setState(() {
+        _startDate = picked.start;
+        _endDate = picked.end;
+        _driverStream = _driverStreamData();
+      });
+    }
   }
 
   void _loadNextPage() {
@@ -205,6 +239,10 @@ class _ManageDriversScreenState extends State<ManageDriversScreen> {
                   children: [
                     Text("Manage Drivers",
                         style: appStyle(16, kDark, FontWeight.normal)),
+                    //apply date filter in this code...
+                    IconButton(
+                        onPressed: () => _selectDateRange(context),
+                        icon: Icon(Icons.calendar_month, color: kDark)),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -259,6 +297,7 @@ class _ManageDriversScreenState extends State<ManageDriversScreen> {
                               buildTableHeaderCell("D'Name"),
                               buildTableHeaderCell("Phone"),
                               buildTableHeaderCell("Email"),
+                              buildTableHeaderCell("T'Earning"),
                               buildTableHeaderCell("Active"),
                             ],
                           ),
@@ -266,6 +305,9 @@ class _ManageDriversScreenState extends State<ManageDriversScreen> {
                             buildDriverTableRow(data, streamData.indexOf(data)),
                           TableRow(
                             children: [
+                              TableCell(
+                                child: SizedBox(),
+                              ),
                               TableCell(
                                 child: SizedBox(),
                               ),
@@ -498,6 +540,7 @@ class _ManageDriversScreenState extends State<ManageDriversScreen> {
     final driverName = driverData["userName"] ?? "";
     final driverPhone = driverData["phoneNumber"] ?? "";
     final driverEmail = driverData["email"] ?? "";
+    final driverToalEarning = driverData["totalEarning"] ?? "";
     final bool approved = driverData["approved"];
     final docId = data.id;
 
@@ -507,6 +550,7 @@ class _ManageDriversScreenState extends State<ManageDriversScreen> {
         buildTableCell(driverName, data),
         buildTableCell(driverPhone, data),
         buildTableCell(driverEmail, data),
+        buildTableCell(driverToalEarning.toString(), data),
         TableCell(
           child: Switch(
             key: UniqueKey(),

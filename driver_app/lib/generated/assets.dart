@@ -14,8 +14,10 @@ class Assets {
   static const String assetsAddItems = 'assets/add-items.png';
   static const String assetsAppstore = 'assets/appstore.png';
   static const String assetsBill = 'assets/bill.png';
-  static const String assetsCategoryPacketWhite = 'assets/category_packet_white.png';
-  static const String assetsFront1713203558343898 = 'assets/front_1713203558343898.jpg';
+  static const String assetsCategoryPacketWhite =
+      'assets/category_packet_white.png';
+  static const String assetsFront1713203558343898 =
+      'assets/front_1713203558343898.jpg';
   static const String assetsHalfNew = 'assets/half-new.png';
   static const String assetsHouse = 'assets/house.png';
   static const String assetsIndia = 'assets/india.png';
@@ -62,7 +64,7 @@ class Assets {
   static const String assetsVegetarian = 'assets/vegetarian.png';
   static const String fontsPALATIN1 = 'assets/fonts/PALATIN1.TTF';
   static const String foodlyBar = 'assets/foodly/bar.png';
-  static const String foodlyBento Box = 'assets/foodly/Bento Box.png';
+  static const String foodlyBentoBox = 'assets/foodly/Bento Box.png';
   static const String foodlyChicken = 'assets/foodly/chicken.png';
   static const String foodlyChinese = 'assets/foodly/chinese.png';
   static const String foodlyCurry = 'assets/foodly/curry.png';
@@ -77,5 +79,4 @@ class Assets {
   static const String imagesProfile = 'assets/images/profile.jpg';
   static const String imagesRatingBk = 'assets/images/rating_bk.jpg';
   static const String imagesRestaurantBk = 'assets/images/restaurant_bk.png';
-
 }

@@ -3,10 +3,12 @@ import 'package:admin_app/utils/app_style.dart';
 import 'package:admin_app/views/category/categories_screen.dart';
 import 'package:admin_app/views/coupons/manage_coupons_screen.dart';
 import 'package:admin_app/views/items/manage_items.dart';
+import 'package:admin_app/views/lowestPrice/lowest_price.dart';
 import 'package:admin_app/views/manageDrivers/manage_driver_details_screen.dart';
 import 'package:admin_app/views/manageOrders/manage_orders.dart';
 import 'package:admin_app/views/manageVendors/manage_vendors.dart';
 import 'package:admin_app/views/subCategory/subcategory_screen.dart';
+import 'package:admin_app/views/trendingStore/trending.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -85,13 +87,18 @@ class _AppSideAdminDashBoardScreenState
                   () => Get.to(() => ManageDriversScreen())),
               buildListTile(Icons.people, "Vendors",
                   () => Get.to(() => ManageVendorsScreen())),
+              buildListTile(Icons.people, "Trending Store",
+                  () => Get.to(() => TrendingStore())),
+              buildListTile(Icons.people, "Lowest Price",
+                  () => Get.to(() => LowestPriceScreen())),
               buildListTile(Icons.category, "Categories",
                   () => Get.to(() => CategoriesScreen())),
               buildListTile(Icons.category, "Sub-Categories",
                   () => Get.to(() => SubCategoriesScreen())),
               buildListTile(FontAwesomeIcons.list, "Items",
                   () => Get.to(() => ManageItemsScreen())),
-              buildListTile(FontAwesomeIcons.cartShopping, "Orders", () => {}
+              buildListTile(FontAwesomeIcons.cartShopping, "Orders",
+                  () => Get.to(() => ManageOrdersScreen())
                   // () => Get.to(() => ManageOrdersScreen()),
                   ),
               buildListTile(Icons.bookmark_add_rounded, "Banners", () {}),

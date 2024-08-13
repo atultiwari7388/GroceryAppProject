@@ -58,6 +58,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
   num discountValue = 0;
   var logger = Logger();
   num finalTimeAfterAdding10 = 0;
+  String vendorId = "";
   // bool isButtonEnabled = false;
 
   @override
@@ -385,6 +386,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
                               itemBuilder: (ctx, index) {
                                 final food = snapshot.data!.docs[index];
                                 final foodId = food.id;
+                                vendorId = food["venId"];
                                 // resIds = food["resId"];
                                 final Map<String, dynamic> selectedAddOns =
                                     food["selectedAddOnsPrice"];
@@ -583,7 +585,6 @@ class _CheckoutScreenState extends State<CheckoutScreen>
             "",
             userLatitude,
             userLongitude,
-
             calculatedTotalBill,
             //subtotoal
             subtotal,
@@ -595,6 +596,7 @@ class _CheckoutScreenState extends State<CheckoutScreen>
             isDeliveryChargesApplied ? deliveryCharges : 0,
             gstAmountPrice,
             time.toString(),
+            vendorId,
             // orderList,
           ).then((value) {
             setState(() {
