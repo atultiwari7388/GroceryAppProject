@@ -35,19 +35,27 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   Stream<List<DocumentSnapshot>> _categoryStreamData() {
     Query query = FirebaseCollectionServices().allCategoriesList;
 
-    // Apply orderBy and where clauses based on search text
-    if (searchController.text.isNotEmpty) {
-      query = query
-          .orderBy("categoryName")
-          .where("categoryName",
-              isGreaterThanOrEqualTo: "${searchController.text}")
-          .where("categoryName",
-              isLessThanOrEqualTo: "${searchController.text}\uf8ff");
-    } else {
+    if (searchController.text.isEmpty) {
       query = query.orderBy("created_at", descending: true);
+    } else {
+      query = query.orderBy("categoryName");
     }
 
-    return query.limit(_perPage).snapshots().map((snapshot) => snapshot.docs);
+    return query.limit(_perPage).snapshots().map((snapshot) {
+      // If search text is empty, return the unfiltered data
+      if (searchController.text.isEmpty) {
+        return snapshot.docs;
+      } else {
+        // Filter the results locally
+        String searchText = searchController.text.toLowerCase();
+        return snapshot.docs.where((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          final categoryName =
+              (data['categoryName'] ?? '').toString().toLowerCase();
+          return categoryName.contains(searchText);
+        }).toList();
+      }
+    });
   }
 
   void _loadNextPage() {

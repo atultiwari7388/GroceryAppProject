@@ -35,18 +35,26 @@ class _ManageItemsScreenState extends State<ManageItemsScreen> {
   Stream<List<DocumentSnapshot>> _getItemsStream() {
     Query query = FirebaseCollectionServices().allItemsList;
 
-    // Apply orderBy and where clauses based on search text
-    if (searchController.text.isNotEmpty) {
-      query = query
-          .orderBy("title")
-          .where("title", isGreaterThanOrEqualTo: "${searchController.text}")
-          .where("title",
-              isLessThanOrEqualTo: "${searchController.text}\uf8ff");
-    } else {
+    if (searchController.text.isEmpty) {
       query = query.orderBy("created_at", descending: true);
+    } else {
+      query = query.orderBy("title");
     }
 
-    return query.limit(_perPage).snapshots().map((snapshot) => snapshot.docs);
+    return query.limit(_perPage).snapshots().map((snapshot) {
+      // If search text is empty, return the unfiltered data
+      if (searchController.text.isEmpty) {
+        return snapshot.docs;
+      } else {
+        // Filter the results locally
+        String searchText = searchController.text.toLowerCase();
+        return snapshot.docs.where((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          final title = (data['title'] ?? '').toString().toLowerCase();
+          return title.contains(searchText);
+        }).toList();
+      }
+    });
   }
 
   void _loadNextPage() {
@@ -183,7 +191,8 @@ class _ManageItemsScreenState extends State<ManageItemsScreen> {
         : Scaffold(
             appBar: AppBar(
                 backgroundColor: kTertiary,
-                title:  Text("Manage Items", style: appStyle(17, kWhite, FontWeight.w500))),
+                title: Text("Manage Items",
+                    style: appStyle(17, kWhite, FontWeight.w500))),
             body: Container(
               padding: const EdgeInsets.all(5),
               margin: const EdgeInsets.all(5),
@@ -203,8 +212,7 @@ class _ManageItemsScreenState extends State<ManageItemsScreen> {
                                 transition: Transition.cupertino,
                                 duration: const Duration(milliseconds: 900)),
                             child: Text("Add Items",
-                                style: appStyle(
-                                    12, kWhite, FontWeight.normal)))
+                                style: appStyle(12, kWhite, FontWeight.normal)))
                       ],
                     ),
                     const SizedBox(height: 10),
@@ -253,7 +261,8 @@ class _ManageItemsScreenState extends State<ManageItemsScreen> {
                             border: TableBorder.all(color: kDark, width: 1.0),
                             children: [
                               TableRow(
-                                decoration: const BoxDecoration(color: kTertiary),
+                                decoration:
+                                    const BoxDecoration(color: kTertiary),
                                 children: [
                                   buildTableHeaderCell("Sr.no."),
                                   buildTableHeaderCell("Item Name"),

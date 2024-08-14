@@ -50,35 +50,97 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     // fetchNearByRestaurantsLocation();
   }
 
+  // void searchFromFirebase(String query) async {
+  //   if (query.isNotEmpty) {
+  //     // Fetch categories that match the search text
+  //     QuerySnapshot categorySnapshot = await FirebaseFirestore.instance
+  //         .collection('Categories')
+  //         .where('categoryName', isGreaterThanOrEqualTo: query)
+  //         .where('categoryName', isLessThanOrEqualTo: query + '\uf8ff')
+  //         .get();
+
+  //     // Fetch item names that match the search text
+  //     QuerySnapshot itemSnapshot = await FirebaseFirestore.instance
+  //         .collection('Items')
+  //         .where('title', isGreaterThanOrEqualTo: query)
+  //         .where('title', isLessThanOrEqualTo: query + '\uf8ff')
+  //         .get();
+
+  //     setState(() {
+  //       searchResults = [
+  //         ...categorySnapshot.docs,
+  //         ...itemSnapshot.docs,
+  //       ];
+  //     });
+  //   } else if (query.isEmpty) {
+  //     // Clear results if the query is empty
+  //     setState(() {
+  //       searchResults.clear();
+  //       searchController.clear();
+  //     });
+  //   } else {
+  //     setState(() {
+  //       searchResults.clear();
+  //       searchController.clear();
+  //     });
+  //   }
+  // }
+
+  // void _performSearch(String searchQuery) {
+  //   if (searchQuery.isEmpty) {
+  //     setState(() {
+  //       searchResults.clear();
+  //       searchController.clear();
+  //     });
+  //   } else {
+  //     final results = searchResults.where((doc) {
+  //       final data = doc.data() as Map<String, dynamic>;
+  //       final categoryName = data['categoryName']?.toLowerCase() ?? '';
+  //       final title = data['title']?.toLowerCase() ?? '';
+  //       return categoryName.contains(searchQuery) ||
+  //           title.contains(searchQuery);
+  //     }).toList();
+
+  //     setState(() {
+  //       searchResults = results;
+  //     });
+  //   }
+  // }
+
   void searchFromFirebase(String query) async {
     if (query.isNotEmpty) {
+      String lowerCaseQuery = query.toLowerCase();
+
       // Fetch categories that match the search text
-      QuerySnapshot categorySnapshot = await FirebaseFirestore.instance
-          .collection('Categories')
-          .where('categoryName', isGreaterThanOrEqualTo: query)
-          .where('categoryName', isLessThanOrEqualTo: query + '\uf8ff')
-          .get();
+      QuerySnapshot categorySnapshot =
+          await FirebaseFirestore.instance.collection('Categories').get();
 
       // Fetch item names that match the search text
-      QuerySnapshot itemSnapshot = await FirebaseFirestore.instance
-          .collection('Items')
-          .where('title', isGreaterThanOrEqualTo: query)
-          .where('title', isLessThanOrEqualTo: query + '\uf8ff')
-          .get();
+      QuerySnapshot itemSnapshot =
+          await FirebaseFirestore.instance.collection('Items').get();
+
+      // Filter locally for case-insensitive matching
+      final categoryResults = categorySnapshot.docs.where((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        final categoryName =
+            (data['categoryName'] ?? '').toString().toLowerCase();
+        return categoryName.contains(lowerCaseQuery);
+      }).toList();
+
+      final itemResults = itemSnapshot.docs.where((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        final title = (data['title'] ?? '').toString().toLowerCase();
+        return title.contains(lowerCaseQuery);
+      }).toList();
 
       setState(() {
         searchResults = [
-          ...categorySnapshot.docs,
-          ...itemSnapshot.docs,
+          ...categoryResults,
+          ...itemResults,
         ];
       });
-    } else if (query.isEmpty) {
-      // Clear results if the query is empty
-      setState(() {
-        searchResults.clear();
-        searchController.clear();
-      });
     } else {
+      // Clear results if the query is empty
       setState(() {
         searchResults.clear();
         searchController.clear();
@@ -93,12 +155,14 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         searchController.clear();
       });
     } else {
+      String lowerCaseQuery = searchQuery.toLowerCase();
+
       final results = searchResults.where((doc) {
         final data = doc.data() as Map<String, dynamic>;
         final categoryName = data['categoryName']?.toLowerCase() ?? '';
         final title = data['title']?.toLowerCase() ?? '';
-        return categoryName.contains(searchQuery) ||
-            title.contains(searchQuery);
+        return categoryName.contains(lowerCaseQuery) ||
+            title.contains(lowerCaseQuery);
       }).toList();
 
       setState(() {

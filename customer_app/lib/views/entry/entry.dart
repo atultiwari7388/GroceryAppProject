@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../../constants/constants.dart';
 import '../../controllers/tab_index_controller.dart';
 import '../../services/collection_ref.dart';
@@ -12,9 +11,22 @@ import '../cart/cart_screen.dart';
 import '../history/history_screen.dart';
 
 // ignore: must_be_immutable
-class EntryScreen extends StatelessWidget {
+class EntryScreen extends StatefulWidget {
   // ignore: use_key_in_widget_constructors
   EntryScreen({Key? key});
+
+  @override
+  State<EntryScreen> createState() => _EntryScreenState();
+}
+
+class _EntryScreenState extends State<EntryScreen> {
+  int tab = 0;
+
+  void setTab(int index) {
+    setState(() {
+      tab = index;
+    });
+  }
 
   Stream<int> getCartItemCountStream(String userId) {
     // Access Firestore instance
@@ -30,15 +42,14 @@ class EntryScreen extends StatelessWidget {
     return cartRef.snapshots().map((snapshot) => snapshot.docs.length);
   }
 
-  List<Widget> screens = const [
-    DashBoardScreen(),
-    HistoryScreen(),
-    CartScreen(),
-    // ProfileScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    List<Widget> screens = [
+      DashBoardScreen(),
+      HistoryScreen(setTab: setTab),
+      CartScreen(),
+    ];
+
     final controller = Get.put(TabIndexController());
 
     // Get the currently logged-in user's UID

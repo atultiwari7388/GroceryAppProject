@@ -17,8 +17,8 @@ void main() async {
         projectId: "groceryapp-july",
         storageBucket: "groceryapp-july.appspot.com",
         messagingSenderId: "219661912834",
-        appId: "1:219661912834:web:768a4a05c878f958c9101b",
-        measurementId: "G-EK14NGELQK",
+        appId: "1:219661912834:web:635ddbed8728827ec9101b",
+        measurementId: "G-045Y5HN6X2",
       ),
     );
   } else {

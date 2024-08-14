@@ -445,82 +445,21 @@ class _ManageDriversScreenState extends State<ManageDriversScreen> {
                 child: Switch(
                   key: UniqueKey(),
                   value: isActive,
-                  onChanged: (bool value) {
+                  onChanged: (value) {
                     if (value) {
-                      // Show the popup to select driver type
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          String selectedType = "";
-                          return StatefulBuilder(
-                            builder: (context, setState) {
-                              return AlertDialog(
-                                title: Text('Select Driver Type'),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    ListTile(
-                                      title: Text('CommissionType'),
-                                      leading: Radio<String>(
-                                        value: 'CommissionType',
-                                        groupValue: selectedType,
-                                        onChanged: (String? value) {
-                                          setState(() {
-                                            selectedType = value!;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                    ListTile(
-                                      title: Text('SalaryType'),
-                                      leading: Radio<String>(
-                                        value: 'SalaryType',
-                                        groupValue: selectedType,
-                                        onChanged: (String? value) {
-                                          setState(() {
-                                            selectedType = value!;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                actions: [
-                                  TextButton(
-                                    child: Text('Cancel'),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                  TextButton(
-                                    child: Text('Confirm'),
-                                    onPressed: () {
-                                      if (selectedType != null) {
-                                        docRef.update({
-                                          'approved': value,
-                                          'cType': selectedType,
-                                        }).then((value) {
-                                          showToastMessage("Success",
-                                              "Value updated", Colors.green);
-                                        });
-                                        setState(() {
-                                          isActive = value;
-                                        });
-                                        Navigator.of(context).pop();
-                                      } else {
-                                        showToastMessage(
-                                            "Error",
-                                            "Please select a driver type",
-                                            Colors.red);
-                                      }
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                      );
+                      _showDriverTypeDialog(docRef.id, driverName);
+                    } else {
+                      // Update Firestore document when switch is turned off
+                      docRef.update({
+                        'approved': value,
+                      }).then((value) {
+                        showToastMessage(
+                            "Success", "Value updated", Colors.green);
+                      }).catchError((error) {
+                        showToastMessage(
+                            "Error", "Failed to update value", Colors.red);
+                      });
+                      setState(() {}); // Trigger a state update
                     }
                   },
                 ),

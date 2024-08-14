@@ -15,7 +15,7 @@ class AuthenticationScreen extends StatefulWidget {
 class _AuthenticationScreenState extends State<AuthenticationScreen> {
   final formKey = GlobalKey<FormState>();
   final AuthenticationController authenticationController =
-  Get.put(AuthenticationController());
+      Get.put(AuthenticationController());
 
   @override
   Widget build(BuildContext context) {
@@ -81,31 +81,31 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                       authenticationController.isLoading
                           ? const CircularProgressIndicator(color: kTertiary)
                           : CustomGradientButton(
-                          text: "Login",
-                          onPress: () {
-                            if (formKey.currentState!.validate()) {
-                              controller.loginWithEmailAndPassword();
-                            }
-                          },
-                          h: 45,
-                          w: 400),
+                              text: "Login",
+                              onPress: () {
+                                if (formKey.currentState!.validate()) {
+                                  controller.loginWithEmailAndPassword();
+                                }
+                              },
+                              h: 45,
+                              w: 400),
                       const SizedBox(height: 30),
                     ],
                   ),
                 ),
-                if (kIsWeb)
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.only(
-                          bottom: 80, top: 80, left: 80, right: 80),
-                      child: Image.asset(
-                        "assets/logo.png",
-                        fit: BoxFit.cover,
+                // if (kIsWeb)
+                //   Expanded(
+                //     child: Container(
+                //       padding: const EdgeInsets.only(
+                //           bottom: 80, top: 80, left: 80, right: 80),
+                //       child: Image.asset(
+                //         "assets/logo.png",
+                //         fit: BoxFit.cover,
 
-                        // color: Colors.black,
-                      ),
-                    ),
-                  )
+                //         // color: Colors.black,
+                //       ),
+                //     ),
+                //   )
               ],
             ),
           );

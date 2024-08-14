@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:admin_app/services/firebase_collection_services.dart';
-import 'package:admin_app/views/subCategory/add_sub_category.dart';
-import 'package:admin_app/views/subCategory/edit_subcat.dart';
+import 'package:admin_app/views/sizes/add_size.dart';
+import 'package:admin_app/views/sizes/edit_size.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,58 +11,49 @@ import '../../constants/constants.dart';
 import '../../utils/app_style.dart';
 import '../../utils/toast_msg.dart';
 
-class SubCategoriesScreen extends StatefulWidget {
-  static const String id = "sub_categories_screen";
+class ManageSizesScreen extends StatefulWidget {
+  static const String id = "sizes_screen";
 
-  const SubCategoriesScreen({super.key});
+  const ManageSizesScreen({super.key});
 
   @override
-  State<SubCategoriesScreen> createState() => _SubCategoriesScreenState();
+  State<ManageSizesScreen> createState() => _ManageSizesScreenState();
 }
 
-class _SubCategoriesScreenState extends State<SubCategoriesScreen> {
+class _ManageSizesScreenState extends State<ManageSizesScreen> {
   final TextEditingController searchController = TextEditingController();
-  late Stream<List<DocumentSnapshot>> _subCatStream;
+  late Stream<List<DocumentSnapshot>> _categoryStream;
   int _perPage = 10;
   int _currentPage = 0;
 
   @override
   void initState() {
     super.initState();
-    _subCatStream = _subCatStreamData();
+    _categoryStream = _categoryStreamData();
   }
 
-  Stream<List<DocumentSnapshot>> _subCatStreamData() {
-    Query query = FirebaseCollectionServices().allSubCategoriesList;
+  Stream<List<DocumentSnapshot>> _categoryStreamData() {
+    Query query = FirebaseCollectionServices().allSizesList;
 
-    if (searchController.text.isEmpty) {
-      query = query.orderBy("created_at", descending: true);
+    // Apply orderBy and where clauses based on search text
+    if (searchController.text.isNotEmpty) {
+      query = query
+          .orderBy("title")
+          .where("title", isGreaterThanOrEqualTo: "${searchController.text}")
+          .where("title",
+              isLessThanOrEqualTo: "${searchController.text}\uf8ff");
     } else {
-      query = query.orderBy("subCatName");
+      query = query.orderBy("created_at", descending: true);
     }
 
-    return query.limit(_perPage).snapshots().map((snapshot) {
-      // If search text is empty, return the unfiltered data
-      if (searchController.text.isEmpty) {
-        return snapshot.docs;
-      } else {
-        // Filter the results locally
-        String searchText = searchController.text.toLowerCase();
-        return snapshot.docs.where((doc) {
-          final data = doc.data() as Map<String, dynamic>;
-          final subCatName =
-              (data['subCatName'] ?? '').toString().toLowerCase();
-          return subCatName.contains(searchText);
-        }).toList();
-      }
-    });
+    return query.limit(_perPage).snapshots().map((snapshot) => snapshot.docs);
   }
 
   void _loadNextPage() {
     setState(() {
       _currentPage++;
       _perPage += 10;
-      _subCatStream = _subCatStreamData();
+      _categoryStream = _categoryStreamData();
       log(_currentPage.toString());
       log(_perPage.toString());
     });
@@ -85,13 +76,12 @@ class _SubCategoriesScreenState extends State<SubCategoriesScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Sub Categories",
-                    style: appStyle(25, kDark, FontWeight.normal)),
+                Text("Sizes", style: appStyle(25, kDark, FontWeight.normal)),
                 CustomGradientButton(
                   w: 220,
                   h: 45,
-                  text: "Add Sub-Category",
-                  onPress: () => Get.to(() => const AddSubCategory(),
+                  text: "Add Size",
+                  onPress: () => Get.to(() => const AddSize(),
                       transition: Transition.cupertino,
                       duration: const Duration(milliseconds: 900)),
                 ),
@@ -101,7 +91,7 @@ class _SubCategoriesScreenState extends State<SubCategoriesScreen> {
             TextField(
               controller: searchController,
               decoration: InputDecoration(
-                labelText: 'Search by Sub cat name',
+                labelText: 'Search by sizes name',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30.0), // Make it circular
                   borderSide: const BorderSide(color: Colors.grey, width: 1.0),
@@ -118,22 +108,23 @@ class _SubCategoriesScreenState extends State<SubCategoriesScreen> {
                   onPressed: () {
                     searchController.clear();
                     setState(() {
-                      _subCatStream = _subCatStreamData(); // Update the stream
+                      _categoryStream =
+                          _categoryStreamData(); // Update the stream
                     });
                   },
                 ),
               ),
               onChanged: (value) {
                 setState(() {
-                  _subCatStream = _subCatStreamData(); // Update the stream
+                  _categoryStream = _categoryStreamData(); // Update the stream
                 });
               },
             ),
             SizedBox(height: 30),
             buildHeadingRowWidgets(
-                "Sr.no.", "Category Name", "Priority", "Actions", "Active"),
+                "Sr.no.", "Size Name", "Priority", "Actions", "Active"),
             StreamBuilder<List<DocumentSnapshot>>(
-              stream: _subCatStream,
+              stream: _categoryStream,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   final streamData = snapshot.data!;
@@ -149,10 +140,10 @@ class _SubCategoriesScreenState extends State<SubCategoriesScreen> {
                               streamData[index].data() as Map<String, dynamic>;
                           final serialNumber = index + 1;
                           // final docId = data["docId"] ?? "";
-                          final categoryName = data["subCatName"] ?? "";
+                          final categoryName = data["title"] ?? "";
                           final priority = data["priority"].toString();
                           final bool approved = data["active"];
-                          final String categoryId = data["categoryId"] ?? "";
+                          final String categoryId = data["id"] ?? "";
 
                           return reusableRowWidget(
                               serialNumber.toString(),
@@ -188,7 +179,13 @@ class _SubCategoriesScreenState extends State<SubCategoriesScreen> {
       );
     } else {
       return Scaffold(
-        appBar: AppBar(title: Text("Sub-Categories")),
+        appBar: AppBar(
+          backgroundColor: kTertiary,
+          title: Text(
+            "Sizes",
+            style: appStyle(18, kWhite, FontWeight.normal),
+          ),
+        ),
         body: SingleChildScrollView(
           child: Container(
             padding: const EdgeInsets.all(5),
@@ -198,23 +195,23 @@ class _SubCategoriesScreenState extends State<SubCategoriesScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Sub-Categories",
+                    Text("Sizes",
                         style: appStyle(16, kDark, FontWeight.normal)),
                     ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                            backgroundColor: kDarkGray),
-                        onPressed: () => Get.to(() => const AddSubCategory(),
+                            backgroundColor: kTertiary),
+                        onPressed: () => Get.to(() => const AddSize(),
                             transition: Transition.cupertino,
                             duration: const Duration(milliseconds: 900)),
-                        child: Text("Add Sub-Category",
-                            style: appStyle(12, kSecondary, FontWeight.normal)))
+                        child: Text("Add Size",
+                            style: appStyle(12, kWhite, FontWeight.normal)))
                   ],
                 ),
-                const SizedBox(height: 15),
+                const SizedBox(height: 30),
                 TextField(
                   controller: searchController,
                   decoration: InputDecoration(
-                    labelText: 'Search by Sub cat name',
+                    labelText: 'Search by size name',
                     border: OutlineInputBorder(
                       borderRadius:
                           BorderRadius.circular(30.0), // Make it circular
@@ -234,21 +231,22 @@ class _SubCategoriesScreenState extends State<SubCategoriesScreen> {
                       onPressed: () {
                         searchController.clear();
                         setState(() {
-                          _subCatStream =
-                              _subCatStreamData(); // Update the stream
+                          _categoryStream =
+                              _categoryStreamData(); // Update the stream
                         });
                       },
                     ),
                   ),
                   onChanged: (value) {
                     setState(() {
-                      _subCatStream = _subCatStreamData(); // Update the stream
+                      _categoryStream =
+                          _categoryStreamData(); // Update the stream
                     });
                   },
                 ),
-                SizedBox(height: 15),
+                SizedBox(height: 30),
                 StreamBuilder<List<DocumentSnapshot>>(
-                  stream: _subCatStream,
+                  stream: _categoryStream,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       final streamData = snapshot.data!;
@@ -256,10 +254,10 @@ class _SubCategoriesScreenState extends State<SubCategoriesScreen> {
                         border: TableBorder.all(color: kDark, width: 1.0),
                         children: [
                           TableRow(
-                            decoration: BoxDecoration(color: kDark),
+                            decoration: BoxDecoration(color: kTertiary),
                             children: [
                               buildTableHeaderCell("Sr.No"),
-                              buildTableHeaderCell("C'name"),
+                              buildTableHeaderCell("S'name"),
                               buildTableHeaderCell("Priority"),
                               buildTableHeaderCell("Actions"),
                               buildTableHeaderCell("Active"),
@@ -271,14 +269,14 @@ class _SubCategoriesScreenState extends State<SubCategoriesScreen> {
                               children: [
                                 TableCell(
                                   child: Image.network(
-                                    data["imageUrl"].toString(),
+                                    data["image"].toString(),
                                     height: 50,
                                     width: 50,
                                   ),
                                 ),
                                 TableCell(
                                   child: Text(
-                                    data["subCatName"].toString(),
+                                    data["title"].toString(),
                                     style:
                                         appStyle(12, kDark, FontWeight.normal),
                                     textAlign: TextAlign.center,
@@ -297,12 +295,11 @@ class _SubCategoriesScreenState extends State<SubCategoriesScreen> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       InkWell(
-                                        onTap: () =>
-                                            Get.to(() => EditSubCategoryScreen(
-                                                  subCatId: data["docId"],
-                                                  data: data.data()
-                                                      as Map<String, dynamic>,
-                                                )),
+                                        onTap: () => Get.to(() => EditSize(
+                                              sizeId: data["id"],
+                                              data: data.data()
+                                                  as Map<String, dynamic>,
+                                            )),
                                         child: const Icon(Icons.edit,
                                             color: Colors.green),
                                       ),
@@ -471,8 +468,8 @@ class _SubCategoriesScreenState extends State<SubCategoriesScreen> {
                   child: Row(
                     children: [
                       IconButton(
-                          onPressed: () => Get.to(() => EditSubCategoryScreen(
-                              subCatId: categoryId, data: data)),
+                          onPressed: () => Get.to(
+                              () => EditSize(sizeId: categoryId, data: data)),
                           icon: const Icon(Icons.edit, color: Colors.green)),
                     ],
                   )),

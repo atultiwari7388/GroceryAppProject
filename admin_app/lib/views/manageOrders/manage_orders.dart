@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../constants/constants.dart';
 import '../../utils/app_style.dart';
+import 'order_details_screen.dart';
 
 class ManageOrdersScreen extends StatefulWidget {
   static const String id = "manage_orders_screen";
@@ -205,33 +206,33 @@ class _ManageOrdersScreenState extends State<ManageOrdersScreen> {
                           }
 
                           return InkWell(
-                            // onTap: () => Get.to(() => OrderDetailsScreen(
-                            //       orderId: orderId,
-                            //       userName: cName,
-                            //       userNumber: cNumber,
-                            //       userDeliveryAddress:
-                            //           data["userDeliveryAddress"] ?? "",
-                            //       resName: data["restName"] ?? "Not Found",
-                            //       foodName: foodNames,
-                            //       foodPrice: foodPrices ?? 0,
-                            //       quantity: foodQuantity ?? 0,
-                            //       payMode: payMode,
-                            //       couponCode: data["couponCode"] ?? "",
-                            //       discount: data["discount"] ?? 0.0,
-                            //       managerName: data["managerName"] ?? "",
-                            //       status: data["status"] ?? 0,
-                            //       discountAmountPercentage:
-                            //           discountAmountPercentage,
-                            //       discountAmount: discountAmount,
-                            //       gstAmountPercentage: gstAmountPercentage,
-                            //       gstAmountPrice: gstAmountPrice,
-                            //       deliveryCharges: deliveryCharges,
-                            //       subTotalBill: subTotalBill,
-                            //       totalPrice: totalPrice,
-                            //       orderDate: orderDate,
-                            //       otp: data["otp"] ?? 0,
-                            //     )),
-
+                            onTap: () => Get.to(() => OrderDetailsScreen(
+                                  orderId: orderId,
+                                  userName: cName,
+                                  userNumber: cNumber,
+                                  userDeliveryAddress:
+                                      data["userDeliveryAddress"] ?? "",
+                                  resName: data["restName"] ?? "Not Found",
+                                  foodName: foodNames,
+                                  foodPrice: foodPrices ?? 0,
+                                  quantity: foodQuantity ?? 0,
+                                  payMode: payMode,
+                                  couponCode: data["couponCode"] ?? "",
+                                  discount: data["discount"] ?? 0.0,
+                                  // managerName: data["managerName"] ?? "",
+                                  vendorName: data["vendorName"] ?? "",
+                                  status: data["status"] ?? 0,
+                                  discountAmountPercentage:
+                                      discountAmountPercentage,
+                                  discountAmount: discountAmount,
+                                  gstAmountPercentage: gstAmountPercentage,
+                                  gstAmountPrice: gstAmountPrice,
+                                  deliveryCharges: deliveryCharges,
+                                  subTotalBill: subTotalBill,
+                                  totalPrice: totalPrice,
+                                  orderDate: orderDate,
+                                  otp: data["otp"] ?? 0,
+                                )),
                             child: reusableRowWidget(
                               orderId,
                               cName,
@@ -433,34 +434,34 @@ class _ManageOrdersScreenState extends State<ManageOrdersScreen> {
     return TableCell(
       child: GestureDetector(
         onTap: () {
-          // Get.to(() => OrderDetailsScreen(
-          //       orderId: data["orderId"] ?? "",
-          //       userName: data["userName"] ?? "",
-          //       userNumber: data["userPhoneNumber"] ?? "",
-          //       userDeliveryAddress: data["userDeliveryAddress"] ?? "",
-          //       resName: data["restName"] ?? "Not Found",
-          //       foodName: orderItems
-          //           .map((item) => item["foodName"].toString())
-          //           .toList(),
-          //       foodPrice:
-          //           orderItems.map((item) => item["foodPrice"] as num).toList(),
-          //       quantity:
-          //           orderItems.map((item) => item["quantity"] as num).toList(),
-          //       payMode: data["payMode"] ?? "",
-          //       couponCode: firstOrderItem["couponCode"] ?? "",
-          //       discount: firstOrderItem["discount"] ?? 0.0,
-          //       managerName: data["managerName"] ?? "",
-          //       status: data["status"] ?? 0,
-          //       discountAmountPercentage: discountAmountPercentage,
-          //       discountAmount: discountAmount,
-          //       gstAmountPercentage: gstAmountPercentage,
-          //       gstAmountPrice: gstAmountPrice,
-          //       deliveryCharges: deliveryCharges,
-          //       subTotalBill: subTotalBill,
-          //       totalPrice: totalPrice,
-          //       orderDate: orderDate,
-          //       otp: data["otp"] ?? 0,
-          //     ));
+          Get.to(() => OrderDetailsScreen(
+                orderId: data["orderId"] ?? "",
+                userName: data["userName"] ?? "",
+                userNumber: data["userPhoneNumber"] ?? "",
+                userDeliveryAddress: data["userDeliveryAddress"] ?? "",
+                resName: data["restName"] ?? "Not Found",
+                foodName: orderItems
+                    .map((item) => item["foodName"].toString())
+                    .toList(),
+                foodPrice:
+                    orderItems.map((item) => item["foodPrice"] as num).toList(),
+                quantity:
+                    orderItems.map((item) => item["quantity"] as num).toList(),
+                payMode: data["payMode"] ?? "",
+                couponCode: firstOrderItem["couponCode"] ?? "",
+                discount: firstOrderItem["discount"] ?? 0.0,
+                // managerName: data["managerName"] ?? "",
+                status: data["status"] ?? 0,
+                discountAmountPercentage: discountAmountPercentage,
+                discountAmount: discountAmount,
+                gstAmountPercentage: gstAmountPercentage,
+                gstAmountPrice: gstAmountPrice,
+                deliveryCharges: deliveryCharges,
+                subTotalBill: subTotalBill,
+                totalPrice: totalPrice,
+                orderDate: orderDate,
+                otp: data["otp"] ?? 0, vendorName: data["vendorName"] ?? "",
+              ));
         },
         child: Padding(
           padding: const EdgeInsets.all(8.0),
